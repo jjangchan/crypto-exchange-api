@@ -48,10 +48,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.1/bin/cmake
+CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.3/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.22.1/bin/cmake -E rm -f
+RM = /usr/local/Cellar/cmake/3.22.3/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,37 +97,37 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/local/Cellar/cmake/3.22.1/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/local/Cellar/cmake/3.22.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
@@ -263,6 +263,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/crypto_exchange_api.dir/build.make CMakeFiles/crypto_exchange_api.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+unittest/CURLTest.o: unittest/CURLTest.cpp.o
+.PHONY : unittest/CURLTest.o
+
+# target to build an object file
+unittest/CURLTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/crypto_exchange_api.dir/build.make CMakeFiles/crypto_exchange_api.dir/unittest/CURLTest.cpp.o
+.PHONY : unittest/CURLTest.cpp.o
+
+unittest/CURLTest.i: unittest/CURLTest.cpp.i
+.PHONY : unittest/CURLTest.i
+
+# target to preprocess a source file
+unittest/CURLTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/crypto_exchange_api.dir/build.make CMakeFiles/crypto_exchange_api.dir/unittest/CURLTest.cpp.i
+.PHONY : unittest/CURLTest.cpp.i
+
+unittest/CURLTest.s: unittest/CURLTest.cpp.s
+.PHONY : unittest/CURLTest.s
+
+# target to generate assembly for a file
+unittest/CURLTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/crypto_exchange_api.dir/build.make CMakeFiles/crypto_exchange_api.dir/unittest/CURLTest.cpp.s
+.PHONY : unittest/CURLTest.cpp.s
+
 unittest/ConfigTest.o: unittest/ConfigTest.cpp.o
 .PHONY : unittest/ConfigTest.o
 
@@ -308,6 +332,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... unittest/CURLTest.o"
+	@echo "... unittest/CURLTest.i"
+	@echo "... unittest/CURLTest.s"
 	@echo "... unittest/ConfigTest.o"
 	@echo "... unittest/ConfigTest.i"
 	@echo "... unittest/ConfigTest.s"

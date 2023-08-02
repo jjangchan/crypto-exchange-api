@@ -373,6 +373,12 @@
 		<Unit filename="/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/main.cpp">
 			<Option target="crypto_exchange_api"/>
 		</Unit>
+		<Unit filename="/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/src/ExchangeManageMent.h">
+			<Option target="crypto_exchange_api"/>
+		</Unit>
+		<Unit filename="/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/CURLTest.cpp">
+			<Option target="crypto_exchange_api"/>
+		</Unit>
 		<Unit filename="/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/ConfigTest.cpp">
 			<Option target="crypto_exchange_api"/>
 			<Option target="unittest"/>

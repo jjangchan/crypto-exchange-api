@@ -1,15 +1,17 @@
-/usr/local/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api
+/usr/local/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api
 -- >>> OS: APPLE
--- CURL Version: 7.64.1
--- Found Boost: /usr/local/include (found suitable version "1.76.0", minimum required is "1.74.0") found components: program_options thread log_setup log system date_time filesystem regex chrono atomic 
--- Boost Version: 1.76.0
+-- Found CURL: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/lib/libcurl.tbd (found version "7.77.0")  
+-- CURL Version: 7.77.0
+-- Found Boost: /usr/local/include (found suitable version "1.78.0", minimum required is "1.74.0") found components: program_options thread log_setup log system date_time filesystem regex chrono atomic 
+-- Boost Version: 1.78.0
 -- Boost_INCLUDE_DIRS: /usr/local/include
 -- Boost_LIBARIES: /usr/local/lib/libboost_program_options-mt.dylib;/usr/local/lib/libboost_thread-mt.dylib;/usr/local/lib/libboost_log_setup-mt.dylib;/usr/local/lib/libboost_log-mt.dylib;/usr/local/lib/libboost_system-mt.dylib;/usr/local/lib/libboost_date_time-mt.dylib;/usr/local/lib/libboost_filesystem-mt.dylib;/usr/local/lib/libboost_regex-mt.dylib;/usr/local/lib/libboost_chrono-mt.dylib;/usr/local/lib/libboost_atomic-mt.dylib
 -- Boost_LOG_LIBARY: /usr/local/lib/libboost_log-mt.dylib
 -- >>> OS: APPLE
--- CURL Version: 7.64.1
--- Found Boost: /usr/local/include (found suitable version "1.76.0", minimum required is "1.72.0") found components: program_options thread log_setup log system date_time filesystem regex chrono atomic 
--- Boost Version: 1.76.0
+-- Found CURL: -lcurl (found version "7.77.0")  
+-- CURL Version: 7.77.0
+-- Found Boost: /usr/local/include (found suitable version "1.78.0", minimum required is "1.72.0") found components: program_options thread log_setup log system date_time filesystem regex chrono atomic 
+-- Boost Version: 1.78.0
 -- Boost_INCLUDE_DIRS: /usr/local/include
 -- Boost_LIBARIES: /usr/local/lib/libboost_program_options-mt.dylib;/usr/local/lib/libboost_thread-mt.dylib;/usr/local/lib/libboost_log_setup-mt.dylib;/usr/local/lib/libboost_log-mt.dylib;/usr/local/lib/libboost_system-mt.dylib;/usr/local/lib/libboost_date_time-mt.dylib;/usr/local/lib/libboost_filesystem-mt.dylib;/usr/local/lib/libboost_regex-mt.dylib;/usr/local/lib/libboost_chrono-mt.dylib;/usr/local/lib/libboost_atomic-mt.dylib
 -- Boost_LOG_LIBARY: /usr/local/lib/libboost_log-mt.dylib

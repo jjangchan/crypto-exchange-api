@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(crypto_exchange_api)
 
-set(CMAKE_CXX_STANDARD 17)
+
 
 ###################################################################
 # OS Config
@@ -17,9 +17,10 @@ endif()
 ###################################################################
 
 SET(SRC
-        main.cpp unittest/ConfigTest.cpp)
-link_directories(/usr/local/lib)
-link_directories(/usr/local/lib64)
+        main.cpp
+        src/ExchangeManageMent.h)
+
+link_directories(/usr/local/lib /usr/local/opt/openssl/lib)
 
 add_executable(crypto_exchange_api ${SRC})
 
@@ -35,7 +36,6 @@ target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 ######################################################################
 # CURL
-set(CURL_LIBRARY "-lcurl")
 find_package(CURL REQUIRED)
 if(CURL_FOUND)
     include_directories(${CURL_INCLUDE_DIR})
@@ -46,6 +46,7 @@ else()
     message(FATAL_ERROR "Could not find Curl")
 endif()
 ######################################################################
+
 
 ######################################################################
 # Boost
@@ -89,4 +90,23 @@ endif()
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 ######################################################################
 
+
+include_directories(/usr/local/include)
+
+######################################################################
+# WEBSOCKETS
+target_link_libraries(${PROJECT_NAME} websockets)
+######################################################################
+
+######################################################################
+# JSONCPP
+target_link_libraries(${PROJECT_NAME} jsoncpp)
+######################################################################
+
+######################################################################
+# OPENSSL
+target_link_libraries(${PROJECT_NAME} ssl crypto)
+######################################################################
+
 add_subdirectory(unittest)
+

@@ -14,7 +14,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread")
 
 SET(SRC
-        ConfigTest.cpp)
+        ConfigTest.cpp
+        CURLTest.cpp)
 
 link_directories(/usr/local/lib)
 link_directories(/usr/local/lib64)
