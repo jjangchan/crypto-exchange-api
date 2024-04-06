@@ -1,0 +1,236 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "unittest",
+					"childIndexes" : 
+					[
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-unittest-Release-7c581efee5a5aedb7674.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "unittest",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "unittest/lib",
+					"childIndexes" : 
+					[
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-unittest.lib-Release-a9fe9ea4fe6c0eb2dd56.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.17.3"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 2,
+					"source" : "unittest/lib"
+				},
+				{
+					"build" : "unittest/lib/googlemock",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-unittest.lib.googlemock-Release-16b7d38265ecc82982c1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.17.3"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 3,
+					"source" : "unittest/lib/googlemock",
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				},
+				{
+					"build" : "unittest/lib/googletest",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-unittest.lib.googletest-Release-9eca9924452921e163c3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.17.3"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 4,
+					"source" : "unittest/lib/googletest",
+					"targetIndexes" : 
+					[
+						3,
+						4
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "crypto_exchange_api",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						2
+					],
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "unittest",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						3
+					],
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "googletest-distribution",
+					"parentIndex" : 1
+				},
+				{
+					"childIndexes" : 
+					[
+						4
+					],
+					"directoryIndexes" : 
+					[
+						3
+					],
+					"name" : "gmock",
+					"parentIndex" : 2,
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						4
+					],
+					"name" : "gtest",
+					"parentIndex" : 3,
+					"targetIndexes" : 
+					[
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "crypto_exchange_api::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crypto_exchange_api-Release-e2c94fb01af23e6ce0dd.json",
+					"name" : "crypto_exchange_api",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "gmock::@4b475b7ae94933fc28d8",
+					"jsonFile" : "target-gmock-Release-d9d7a1135b7d355d27ca.json",
+					"name" : "gmock",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "gmock_main::@4b475b7ae94933fc28d8",
+					"jsonFile" : "target-gmock_main-Release-b921e6c945b69e1493ef.json",
+					"name" : "gmock_main",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "gtest::@01f4ef49f699ff683d4e",
+					"jsonFile" : "target-gtest-Release-ad4ecfac062367b44ecd.json",
+					"name" : "gtest",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "gtest_main::@01f4ef49f699ff683d4e",
+					"jsonFile" : "target-gtest_main-Release-d84fc991dec4e81d367b.json",
+					"name" : "gtest_main",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "unittest::@a42dad5d64def158963d",
+					"jsonFile" : "target-unittest-Release-97591fe31c03fc4c2b4b.json",
+					"name" : "unittest",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/cmake-build-release",
+		"source" : "/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

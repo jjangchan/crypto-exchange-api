@@ -52,8 +52,8 @@ build cmake_object_order_depends_target_crypto_exchange_api: phony || CMakeFiles
 build CMakeFiles/crypto_exchange_api.dir/main.cpp.o: CXX_COMPILER__crypto_exchange_api_Release /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/main.cpp || cmake_object_order_depends_target_crypto_exchange_api
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = CMakeFiles/crypto_exchange_api.dir/main.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
-  INCLUDES = -I/usr/local/include
+  FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++14
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include
   OBJECT_DIR = CMakeFiles/crypto_exchange_api.dir
   OBJECT_FILE_DIR = CMakeFiles/crypto_exchange_api.dir
 
@@ -67,8 +67,8 @@ build CMakeFiles/crypto_exchange_api.dir/main.cpp.o: CXX_COMPILER__crypto_exchan
 
 build crypto_exchange_api: CXX_EXECUTABLE_LINKER__crypto_exchange_api_Release CMakeFiles/crypto_exchange_api.dir/main.cpp.o | /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/lib/libcurl.tbd /usr/local/lib/libboost_program_options-mt.dylib /usr/local/lib/libboost_thread-mt.dylib /usr/local/lib/libboost_log_setup-mt.dylib /usr/local/lib/libboost_log-mt.dylib /usr/local/lib/libboost_system-mt.dylib /usr/local/lib/libboost_date_time-mt.dylib /usr/local/lib/libboost_filesystem-mt.dylib /usr/local/lib/libboost_regex-mt.dylib /usr/local/lib/libboost_chrono-mt.dylib /usr/local/lib/libboost_atomic-mt.dylib
   FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/lib -Wl,-rpath,/usr/local/opt/openssl/lib  /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/lib/libcurl.tbd  /usr/local/lib/libboost_program_options-mt.dylib  /usr/local/lib/libboost_thread-mt.dylib  /usr/local/lib/libboost_log_setup-mt.dylib  /usr/local/lib/libboost_log-mt.dylib  /usr/local/lib/libboost_system-mt.dylib  /usr/local/lib/libboost_date_time-mt.dylib  /usr/local/lib/libboost_filesystem-mt.dylib  /usr/local/lib/libboost_regex-mt.dylib  /usr/local/lib/libboost_chrono-mt.dylib  /usr/local/lib/libboost_atomic-mt.dylib  -lwebsockets  -ljsoncpp  -lssl  -lcrypto
-  LINK_PATH = -L/usr/local/lib   -L/usr/local/opt/openssl/lib
+  LINK_LIBRARIES = -Wl,-rpath,/usr/local/lib -Wl,-rpath,/usr/local/opt/openssl@3/lib  /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/lib/libcurl.tbd  /usr/local/lib/libboost_program_options-mt.dylib  /usr/local/lib/libboost_thread-mt.dylib  /usr/local/lib/libboost_log_setup-mt.dylib  /usr/local/lib/libboost_log-mt.dylib  /usr/local/lib/libboost_system-mt.dylib  /usr/local/lib/libboost_date_time-mt.dylib  /usr/local/lib/libboost_filesystem-mt.dylib  /usr/local/lib/libboost_regex-mt.dylib  /usr/local/lib/libboost_chrono-mt.dylib  /usr/local/lib/libboost_atomic-mt.dylib  -lssl  -lcrypto
+  LINK_PATH = -L/usr/local/lib   -L/usr/local/opt/openssl@3/lib
   OBJECT_DIR = CMakeFiles/crypto_exchange_api.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -159,7 +159,7 @@ build unittest/CMakeFiles/unittest.dir/ConfigTest.cpp.o: CXX_COMPILER__unittest_
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/CMakeFiles/unittest.dir/ConfigTest.cpp.o.d
   FLAGS = -std=c++17 -pthread -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++17
-  INCLUDES = -I/usr/local/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/CMakeFiles/unittest.dir
   OBJECT_FILE_DIR = unittest/CMakeFiles/unittest.dir
 
@@ -167,7 +167,7 @@ build unittest/CMakeFiles/unittest.dir/CURLTest.cpp.o: CXX_COMPILER__unittest_Re
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/CMakeFiles/unittest.dir/CURLTest.cpp.o.d
   FLAGS = -std=c++17 -pthread -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++17
-  INCLUDES = -I/usr/local/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/CMakeFiles/unittest.dir
   OBJECT_FILE_DIR = unittest/CMakeFiles/unittest.dir
 
@@ -181,8 +181,8 @@ build unittest/CMakeFiles/unittest.dir/CURLTest.cpp.o: CXX_COMPILER__unittest_Re
 
 build unittest/unittest: CXX_EXECUTABLE_LINKER__unittest_Release unittest/CMakeFiles/unittest.dir/ConfigTest.cpp.o unittest/CMakeFiles/unittest.dir/CURLTest.cpp.o | /usr/local/lib/libboost_program_options-mt.dylib /usr/local/lib/libboost_thread-mt.dylib /usr/local/lib/libboost_log_setup-mt.dylib /usr/local/lib/libboost_log-mt.dylib /usr/local/lib/libboost_system-mt.dylib /usr/local/lib/libboost_date_time-mt.dylib /usr/local/lib/libboost_filesystem-mt.dylib /usr/local/lib/libboost_regex-mt.dylib /usr/local/lib/libboost_chrono-mt.dylib /usr/local/lib/libboost_atomic-mt.dylib lib/libgtest.a lib/libgtest_main.a lib/libgtest.a || lib/libgtest.a lib/libgtest_main.a
   FLAGS = -std=c++17 -pthread -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/lib -Wl,-rpath,/usr/local/opt/openssl/lib -Wl,-rpath,/usr/local/lib64  -lcurl  /usr/local/lib/libboost_program_options-mt.dylib  /usr/local/lib/libboost_thread-mt.dylib  /usr/local/lib/libboost_log_setup-mt.dylib  /usr/local/lib/libboost_log-mt.dylib  /usr/local/lib/libboost_system-mt.dylib  /usr/local/lib/libboost_date_time-mt.dylib  /usr/local/lib/libboost_filesystem-mt.dylib  /usr/local/lib/libboost_regex-mt.dylib  /usr/local/lib/libboost_chrono-mt.dylib  /usr/local/lib/libboost_atomic-mt.dylib  lib/libgtest.a  lib/libgtest_main.a  lib/libgtest.a
-  LINK_PATH = -L/usr/local/lib   -L/usr/local/opt/openssl/lib   -L/usr/local/lib64
+  LINK_LIBRARIES = -Wl,-rpath,/usr/local/lib -Wl,-rpath,/usr/local/opt/openssl@3/lib -Wl,-rpath,/usr/local/lib64  -lcurl  /usr/local/lib/libboost_program_options-mt.dylib  /usr/local/lib/libboost_thread-mt.dylib  /usr/local/lib/libboost_log_setup-mt.dylib  /usr/local/lib/libboost_log-mt.dylib  /usr/local/lib/libboost_system-mt.dylib  /usr/local/lib/libboost_date_time-mt.dylib  /usr/local/lib/libboost_filesystem-mt.dylib  /usr/local/lib/libboost_regex-mt.dylib  /usr/local/lib/libboost_chrono-mt.dylib  /usr/local/lib/libboost_atomic-mt.dylib  lib/libgtest.a  lib/libgtest_main.a  lib/libgtest.a
+  LINK_PATH = -L/usr/local/lib   -L/usr/local/opt/openssl@3/lib   -L/usr/local/lib64
   OBJECT_DIR = unittest/CMakeFiles/unittest.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -344,7 +344,7 @@ build unittest/lib/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o: CXX_COMPI
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/lib/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o.d
   FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk  -DGTEST_HAS_PTHREAD=1   -std=c++11
-  INCLUDES = -I/usr/local/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/lib/googlemock/CMakeFiles/gmock.dir
   OBJECT_FILE_DIR = unittest/lib/googlemock/CMakeFiles/gmock.dir/src
 
@@ -378,7 +378,7 @@ build unittest/lib/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o: CXX
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/lib/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o.d
   FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk  -DGTEST_HAS_PTHREAD=1   -std=c++11
-  INCLUDES = -I/usr/local/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googlemock -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/lib/googlemock/CMakeFiles/gmock_main.dir
   OBJECT_FILE_DIR = unittest/lib/googlemock/CMakeFiles/gmock_main.dir/src
 
@@ -483,7 +483,7 @@ build unittest/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o: CXX_COMPI
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o.d
   FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk  -DGTEST_HAS_PTHREAD=1   -std=c++11
-  INCLUDES = -I/usr/local/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/lib/googletest/CMakeFiles/gtest.dir
   OBJECT_FILE_DIR = unittest/lib/googletest/CMakeFiles/gtest.dir/src
 
@@ -517,7 +517,7 @@ build unittest/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o: CXX
   DEFINES = -DBOOST_LOG_DYN_LINK=1
   DEP_FILE = unittest/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o.d
   FLAGS = -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk  -DGTEST_HAS_PTHREAD=1   -std=c++11
-  INCLUDES = -I/usr/local/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
+  INCLUDES = -I/Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/../include -I/usr/local/include -I/usr/local/opt/openssl@3/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest/include -isystem /Users/jjangchan/workspace/Clion/chan-project/crypto-exchange-api/unittest/lib/googletest
   OBJECT_DIR = unittest/lib/googletest/CMakeFiles/gtest_main.dir
   OBJECT_FILE_DIR = unittest/lib/googletest/CMakeFiles/gtest_main.dir/src
 

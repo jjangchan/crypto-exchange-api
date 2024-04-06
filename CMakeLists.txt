@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(crypto_exchange_api)
 
+set(CMAKE_CXX_STANDARD 14)
 
 
 ###################################################################
@@ -18,11 +19,16 @@ endif()
 
 SET(SRC
         main.cpp
-        src/ExchangeManageMent.h)
+        src/ExchangeManageMent.h
+        src/Errors.h
+        src/BinanceAPI.h
+        src/ExchangeType.h)
 
-link_directories(/usr/local/lib /usr/local/opt/openssl/lib)
+link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
+include_directories(../include )
 
 add_executable(crypto_exchange_api ${SRC})
+
 
 ######################################################################
 # THREAD
@@ -57,7 +63,7 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 set(Boost_NO_BOOST_CMAKE         ON)
 find_package(Boost
-        1.74.0
+        1.82.0
         COMPONENTS
         program_options
         thread
@@ -94,17 +100,8 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 include_directories(/usr/local/include)
 
 ######################################################################
-# WEBSOCKETS
-target_link_libraries(${PROJECT_NAME} websockets)
-######################################################################
-
-######################################################################
-# JSONCPP
-target_link_libraries(${PROJECT_NAME} jsoncpp)
-######################################################################
-
-######################################################################
 # OPENSSL
+include_directories(/usr/local/opt/openssl@3/include)
 target_link_libraries(${PROJECT_NAME} ssl crypto)
 ######################################################################
 

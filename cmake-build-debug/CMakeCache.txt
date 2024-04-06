@@ -605,11 +605,11 @@ CURL_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CURL_LIBRARY_RELEASE
 CURL_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //Details about finding Boost
-FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/local/include][cfound components: program_options thread log_setup log system date_time filesystem regex chrono atomic ][v1.78.0(1.72.0)]
+FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/local/include][cfound components: program_options thread log_setup log system date_time filesystem regex chrono atomic ][v1.82.0(1.72.0)]
 //Details about finding CURL
 FIND_PACKAGE_MESSAGE_DETAILS_CURL:INTERNAL=[-lcurl][/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/include][c ][v7.77.0()]
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python][v2.7.18()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python][v()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 PC_CURL_CFLAGS:INTERNAL=
