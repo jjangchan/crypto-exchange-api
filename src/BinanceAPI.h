@@ -26,8 +26,9 @@ public:
     BinanceAPI(boost::asio::io_context& _context,
                std::string _host,
                std::string _port,
+               std::string _send_msg,
                std::size_t kline_size)
-    : ExchangeManagement(_context, std::move(_host), std::move(_port), kline_size){}
+    : ExchangeManagement(_context, std::move(_host), std::move(_port), std::move(_send_msg), kline_size){}
 
     ~BinanceAPI(){}
     BinanceAPI(BinanceAPI&& b_api) noexcept = default;
@@ -57,9 +58,13 @@ public:
         return str;
     }
 
-    ExchangeManagement::handler binance_on_tick(const char* pair, const char* period, on_binance_cb cb){
-            const char* channel = binance::time_frames(period);
-            return ws_pimpl->start_websocket(pair, channel, std::move(cb));
+    void control_msg(Websocket& ws) override{
+        ws.ws_send_pong({});
+    }
+
+    ExchangeManagement::handler binance_on_tick(const char* pair, const time_frame period, on_binance_cb cb){
+            const char* channel = binance::time_frames(time_frame_to_string(period));
+            return ws_pimpl->start_websocket(pair, channel, period, std::move(cb));
     }
 
 private:

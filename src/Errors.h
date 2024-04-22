@@ -57,6 +57,52 @@ enum class binance_error : int{
     ,NO_TRADING_WINDOW = -2016
 };
 
+const char* binance_error_to_string(binance_error e){
+    switch ( e ) {
+        case binance_error::OK : return "OK";
+        case binance_error::UNKNOWN : return "UNKNOWN";
+        case binance_error::DISCONNECTED : return "DISCONNECTED";
+        case binance_error::UNAUTHORIZED : return "UNAUTHORIZED";
+        case binance_error::TOO_MANY_REQUESTS : return "TOO_MANY_REQUESTS";
+        case binance_error::UNEXPECTED_RESP : return "UNEXPECTED_RESP";
+        case binance_error::TIMEOUT : return "TIMEOUT";
+        case binance_error::UNKNOWN_ORDER_COMPOSITION : return "UNKNOWN_ORDER_COMPOSITION";
+        case binance_error::TOO_MANY_ORDERS : return "TOO_MANY_ORDERS";
+        case binance_error::SERVICE_SHUTTING_DOWN : return "SERVICE_SHUTTING_DOWN";
+        case binance_error::UNSUPPORTED_OPERATION : return "UNSUPPORTED_OPERATION";
+        case binance_error::INVALID_TIMESTAMP : return "INVALID_TIMESTAMP";
+        case binance_error::INVALID_SIGNATURE : return "INVALID_SIGNATURE";
+        case binance_error::ILLEGAL_CHARS : return "ILLEGAL_CHARS";
+        case binance_error::TOO_MANY_PARAMETERS : return "TOO_MANY_PARAMETERS";
+        case binance_error::MANDATORY_PARAM_EMPTY_OR_MALFORMED : return "MANDATORY_PARAM_EMPTY_OR_MALFORMED";
+        case binance_error::UNKNOWN_PARAM : return "UNKNOWN_PARAM";
+        case binance_error::UNREAD_PARAMETERS : return "UNREAD_PARAMETERS";
+        case binance_error::PARAM_EMPTY : return "PARAM_EMPTY";
+        case binance_error::PARAM_NOT_REQUIRED : return "PARAM_NOT_REQUIRED";
+        case binance_error::BAD_PRECISION : return "BAD_PRECISION";
+        case binance_error::NO_DEPTH : return "NO_DEPTH";
+        case binance_error::TIF_NOT_REQUIRED : return "TIF_NOT_REQUIRED";
+        case binance_error::INVALID_TIF : return "INVALID_TIF";
+        case binance_error::INVALID_ORDER_TYPE : return "INVALID_ORDER_TYPE";
+        case binance_error::INVALID_SIDE : return "INVALID_SIDE";
+        case binance_error::EMPTY_NEW_CL_ORD_ID : return "EMPTY_NEW_CL_ORD_ID";
+        case binance_error::EMPTY_ORG_CL_ORD_ID : return "EMPTY_ORG_CL_ORD_ID";
+        case binance_error::BAD_INTERVAL : return "BAD_INTERVAL";
+        case binance_error::BAD_SYMBOL : return "BAD_SYMBOL";
+        case binance_error::INVALID_LISTEN_KEY : return "INVALID_LISTEN_KEY";
+        case binance_error::MORE_THAN_XX_HOURS : return "MORE_THAN_XX_HOURS";
+        case binance_error::OPTIONAL_PARAMS_BAD_COMBO : return "OPTIONAL_PARAMS_BAD_COMBO";
+        case binance_error::INVALID_PARAMETER : return "INVALID_PARAMETER";
+        case binance_error::NEW_ORDER_REJECTED : return "NEW_ORDER_REJECTED";
+        case binance_error::CANCEL_REJECTED : return "CANCEL_REJECTED";
+        case binance_error::NO_SUCH_ORDER : return "NO_SUCH_ORDER";
+        case binance_error::BAD_API_KEY_FMT : return "BAD_API_KEY_FMT";
+        case binance_error::REJECTED_MBX_KEY : return "REJECTED_MBX_KEY";
+        case binance_error::NO_TRADING_WINDOW : return "NO_TRADING_WINDOW";
+    }
+    return "UNKNOWN_ERROR";
+}
+
 
 /*************************************************************************************************/
 // https://docs.coinone.co.kr/docs/error-code
@@ -155,8 +201,33 @@ enum class coinone_error : int{
 /*************************************************************************************************/
 
 enum class bithumb_error : int{
-
+    OK = 0,
+    BAD_REQUEST = 5100,
+    NOT_MEMBER = 5200,
+    INVALID_APIKEY = 5300,
+    METHOD_NOT_ALLOWED = 5302,
+    DATABASE_FAIL = 5400,
+    INVALID_PARAMETER = 5500,
+    ETC = 5600,
+    UNKNOWN_ERROR = 5900,
+    NOT_GET_PRICE = 3000
 };
+
+const char* bithumb_error_to_string(bithumb_error e){
+    switch ( e ) {
+        case bithumb_error::OK : return "OK";
+        case bithumb_error::BAD_REQUEST : return "BAD_REQUEST";
+        case bithumb_error::NOT_MEMBER : return "NOT_MEMBER";
+        case bithumb_error::INVALID_APIKEY : return "INVALID_APIKEY";
+        case bithumb_error::METHOD_NOT_ALLOWED : return "METHOD_NOT_ALLOWED";
+        case bithumb_error::DATABASE_FAIL : return "DATABASE_FAIL";
+        case bithumb_error::INVALID_PARAMETER : return "INVALID_PARAMETER";
+        case bithumb_error::ETC : return "ETC";
+        case bithumb_error::UNKNOWN_ERROR : return "UNKNOWN_ERROR";
+        case bithumb_error::NOT_GET_PRICE : return "NOT_GET_PRICE";
+    }
+    return "UNKNOWN_ERROR";
+}
 
 /*************************************************************************************************/
 
