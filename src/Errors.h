@@ -7,6 +7,21 @@
 
 #include "flatjson.hpp"
 
+#define __STRINGIZE_I(x) #x
+#define __STRINGIZE(x) __STRINGIZE_I(x)
+
+// file name ( line )
+#define __MAKE_FILELINE \
+    __FILE__ "(" __STRINGIZE(__LINE__) ")"
+
+#define __MESSAGE(msg) \
+    std::strrchr(__FILE__, '/')+1 << "(" __STRINGIZE(__LINE__) "): " << msg << std::flush
+
+#define __MAKE_ERRMSG(res, msg) \
+    res.err_msg = __MAKE_FILELINE; \
+    res.err_msg += ": "; \
+    res.err_msg += msg;
+
 namespace error{
 namespace binance{}
 //namespace coinone{}
@@ -101,6 +116,60 @@ const char* binance_error_to_string(binance_error e){
         case binance_error::NO_TRADING_WINDOW : return "NO_TRADING_WINDOW";
     }
     return "UNKNOWN_ERROR";
+}
+
+/*************************************************************************************************/
+// https://docs.upbit.com/v1.4.0/reference/websocket-error
+// https://docs.upbit.com/v1.4.0/docs/api-%EC%A3%BC%EC%9A%94-%EC%97%90%EB%9F%AC-%EC%BD%94%EB%93%9C-%EB%AA%A9%EB%A1%9D
+enum class upbit_error : int{
+    OK = 0,
+    CREATE_ASK_ERROR = 1,
+    CREATE_BID_ERROR = 2,
+    INSUFFICIENT_FUNDS_ASK = 3,
+    INSUFFICIENT_FUNDS_BID = 4,
+    UNDER_MIN_TOTAL_ASK = 5,
+    UNDER_MIN_TOTAL_BID = 6,
+    WITHDRAW_ADDRESS_NOT_REGISTERD = 7,
+    VALIDATION_ERROR = 8,
+    INVALID_QUERY_PAYLOAD = 9,
+    JWT_VERIFICATION = 10,
+    EXPIRED_ACCESS_KEY = 11,
+    NONCE_USED = 12,
+    NO_AUTHORIZATION_I_P = 13,
+    OUT_OF_SCOPE = 14,
+    INVALID_AUTH = 15,
+    WRONG_FORMAT = 16,
+    NO_TICKET = 17,
+    NO_TYPE = 18,
+    NO_CODES = 19,
+    INVALID_PARAM = 20
+
+};
+
+const char* upbit_error_to_string(const upbit_error e){
+    switch (e) {
+        case upbit_error::OK : return "OK";
+        case upbit_error::CREATE_ASK_ERROR : return "CREATE_ASK_ERROR";
+        case  upbit_error::CREATE_BID_ERROR : return "CREATE_BID_ERROR";
+        case  upbit_error::INSUFFICIENT_FUNDS_ASK : return "INSUFFICIENT_FUNDS_ASK";
+        case  upbit_error::INSUFFICIENT_FUNDS_BID : return "INSUFFICIENT_FUNDS_BID";
+        case  upbit_error::UNDER_MIN_TOTAL_ASK : return "UNDER_MIN_TOTAL_ASK";
+        case  upbit_error::UNDER_MIN_TOTAL_BID : return "UNDER_MIN_TOTAL_BID";
+        case  upbit_error::WITHDRAW_ADDRESS_NOT_REGISTERD : return "WITHDRAW_ADDRESS_NOT_REGISTERD";
+        case  upbit_error::VALIDATION_ERROR : return "VALIDATION_ERROR";
+        case  upbit_error::INVALID_QUERY_PAYLOAD : return "INVALID_QUERY_PAYLOAD";
+        case  upbit_error::JWT_VERIFICATION : return "JWT_VERIFICATION";
+        case  upbit_error::EXPIRED_ACCESS_KEY : return "EXPIRED_ACCESS_KEY";
+        case  upbit_error::NONCE_USED : return "NONCE_USED";
+        case  upbit_error::NO_AUTHORIZATION_I_P : return "NO_AUTHORIZATION_I_P";
+        case  upbit_error::OUT_OF_SCOPE : return "OUT_OF_SCOPE";
+        case  upbit_error::INVALID_AUTH : return "INVALID_AUTH";
+        case  upbit_error::WRONG_FORMAT : return "WRONG_FORMAT";
+        case  upbit_error::NO_TICKET : return "NO_TICKET";
+        case  upbit_error::NO_TYPE : return "NO_TYPE";
+        case  upbit_error::NO_CODES : return "NO_CODES";
+        case  upbit_error::INVALID_PARAM : return "INVALID_PARAM";
+    }
 }
 
 

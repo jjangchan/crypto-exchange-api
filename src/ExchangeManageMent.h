@@ -30,6 +30,7 @@
 #include <boost/callable_traits.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/intrusive/set.hpp>
+#include <boost/variant.hpp>
 
 //===================================== extern =========================================
 #include "flatjson.hpp"
@@ -41,6 +42,7 @@
 /***************************************************************************************/
 using namespace binance;
 struct kline_t;
+struct klines_t;
 
 
 class Websocket : std::enable_shared_from_this<Websocket>{
@@ -86,8 +88,8 @@ public:
     using on_ws_cb = std::function<
             bool(const char *file_name, int ec, std::string err_msg, const char *data, std::size_t size)>;
     using control_cb = std::function<void(Websocket& ws)>;
-    void ws_start(const std::string& _host, const std::string& _port, const std::string& _channel, const std::string& _send_msg, on_ws_cb ws_cb, control_cb cont_cb, ws_ptr_type ws)
-    {return ws_async_start(_host, _port, _channel, _send_msg, std::move(ws_cb), std::move(cont_cb), std::move(ws));}
+    void ws_start(const std::string& _host, const std::string& _port, const std::string& _channel, std::string _send_msg, on_ws_cb ws_cb, control_cb cont_cb, ws_ptr_type ws)
+    {return ws_async_start(_host, _port, _channel, std::move(_send_msg), std::move(ws_cb), std::move(cont_cb), std::move(ws));}
 
     void ws_stop(){
         is_on_async = true;
@@ -115,10 +117,10 @@ public:
     }
 
 private:
-    void ws_async_start(const std::string& _host, const std::string& _port, const std::string& _channel, const std::string& _send_msg, on_ws_cb ws_cb, control_cb cont_cb, ws_ptr_type ws){
+    void ws_async_start(const std::string& _host, const std::string& _port, const std::string& _channel, std::string _send_msg, on_ws_cb ws_cb, control_cb cont_cb, ws_ptr_type ws){
         host = _host;
         channel = _channel;
-        send_msg = _send_msg;
+        send_msg = std::move(_send_msg);
 
 
         // ---> 항목 목록에 대한 쿼리에 정방향 분석을 비동기 수행(호스트 이름 해석)
@@ -261,7 +263,7 @@ private:
         //}
 
         std::string strbuf = boost::beast::buffers_to_string(m_buffer.data());
-        std::cout << "read buffer : " << strbuf << std::endl;
+        //std::cout << "read buffer : " << strbuf << std::endl;
 
         m_buffer.consume(m_buffer.size()); // -> 읽어온 byte 삭제
 
@@ -282,30 +284,47 @@ struct websocket_key_of_value{
     type operator()(const Websocket& ws) const {return std::addressof(ws);}
 };
 
+
 /***************************************************************************************/
 
 class ExchangeManagement{
 private:
 protected:
     class ws_impl;
-    //class rest_impl;
+    class rest_impl;
 
     std::unique_ptr<ws_impl> ws_pimpl;
-    //std::unique_ptr<rest_impl> rest_pimpl;
+    std::unique_ptr<rest_impl> rest_pimpl;
 
 public:
     // constructor
     ExchangeManagement(boost::asio::io_context& _context,
-                       std::string _host,
-                       std::string _port,
-                       std::string _send_msg,
-                       std::size_t kline_size)
-            : ws_pimpl(std::make_unique<ws_impl>(*this ,_context, std::move(_host), std::move(_port), std::move(_send_msg), kline_size)){}
+                       std::string ws_host,
+                       std::string ws_port,
+                       std::string rest_host,
+                       std::string rest_port,
+                       std::string rest_pk,
+                       std::string rest_sk,
+                       std::size_t rest_timeout,
+                       std::string rest_client_user_agent)
+            : ws_pimpl(std::make_unique<ws_impl>(*this ,
+                                                 _context,
+                                                 std::move(ws_host),
+                                                 std::move(ws_port))),
+              rest_pimpl(std::make_unique<rest_impl>(*this,
+                                                     _context,
+                                                     std::move(rest_host),
+                                                     std::move(rest_port),
+                                                     std::move(rest_pk),
+                                                     std::move(rest_sk),
+                                                     rest_timeout,
+                                                     std::move(rest_client_user_agent)))
+    {}
     virtual ~ExchangeManagement(){}
     ExchangeManagement(ExchangeManagement&& management) noexcept = default;
+    ExchangeManagement(const ExchangeManagement& management) = default;
 
     // delete
-    ExchangeManagement(const ExchangeManagement& management) = delete;
     ExchangeManagement& operator=(const ExchangeManagement& management) = delete;
     ExchangeManagement& operator=(ExchangeManagement&& management) noexcept = delete;
 
@@ -317,8 +336,20 @@ public:
     virtual std::pair<int, std::string> info_api_error(const flatjson::fjson& json) = 0;
     virtual std::string make_channel(const char* pair, const char* channel) = 0;
     virtual void control_msg(Websocket& ws) = 0;
+    virtual std::string make_signed() = 0;
 
     using handler = void*;
+
+    template<typename T>
+    struct rest_result{
+        int ec;
+        std::string err_msg;
+        std::string replay;
+        T v;
+
+        // --> return error when false;
+        explicit operator bool() const {return err_msg.empty();}
+    };
 
 private:
 };
@@ -327,6 +358,7 @@ private:
 
 
 class ExchangeManagement::ws_impl{
+
 private:
     ExchangeManagement& exchange;
     // ===================================================================================
@@ -334,8 +366,6 @@ private:
     boost::asio::io_context& asio_context;
     std::string host;
     std::string port;
-    std::string send_msg;
-
 
     boost::intrusive::set<
             Websocket,
@@ -360,24 +390,24 @@ private:
     // ===================================================================================
 
 public:
-    ws_impl(ExchangeManagement& em,boost::asio::io_context& _context, std::string _host, std::string _port, std::string _send_msg, std::size_t _kline_size):
+    ws_impl(ExchangeManagement& em,
+            boost::asio::io_context& _context,
+            std::string _host,
+            std::string _port):
         exchange(em),
         asio_context(_context),
         host(std::move(_host)),
         port(std::move(_port)),
-        send_msg(std::move(_send_msg)),
-        bars_len{_kline_size},
-        ws_set{}{
-        open_times.reserve(bars_len);
-        opens.reserve(bars_len);
-        lows.reserve(bars_len);
-        closes.reserve(bars_len);
-        highs.reserve(bars_len);
-        volumes.reserve(bars_len);
-    }
+        ws_set{}
+    {}
 
-    template<typename F>
-    ExchangeManagement::handler start_websocket(const char* pair, const char* channel, const time_frame period,F cb){
+public:
+    template<
+            typename F,
+            typename R
+            >
+    ExchangeManagement::handler start_websocket(const char* pair, const char* channel, std::string send_msg, unix_time_data& time_data, F cb,R& res){
+
         // call back 함수 argument type 정보를 가져온다.
         using cb_args_type = typename boost::callable_traits::args<F>::type;
 
@@ -394,13 +424,27 @@ public:
         // websocket instance 생성
         std::shared_ptr<Websocket> ws(new Websocket(asio_context), deleter);
 
+        // 거래소 rest api로 가져온 bar data insert
+        if(res){
+            res.v.init_tick_data(bars_len, open_times, opens, highs, lows, closes, volumes);
+            for(std::size_t i = 0; i < open_times.size(); i++){
+                std::cout << "open_times ->" << open_times[i] << std::endl;
+                std::cout << "open ->" << opens[i] << std::endl;
+                std::cout << "high->" << highs[i] << std::endl;
+                std::cout << "low ->" << lows[i] << std::endl;
+                std::cout << "close ->" << closes[i] << std::endl;
+                std::cout << "volume ->" << volumes[i] << std::endl;
+                std::cout <<" ===================================================" << std::endl;
+            }
+        }
+
         // websocket call_back function
-        auto ws_cb = [this, channel, period, cb = std::move(cb)]
+        auto ws_cb = [this, time_data, channel, cb = std::move(cb)]
                 (const char* file_name,
                  int ec,
                  std::string err_msg,
                  const char* data,
-                 std::size_t size) -> bool
+                 std::size_t size) mutable -> bool
         {
             if(ec){ // ---> ws error
                 try{
@@ -427,8 +471,7 @@ public:
             try {
                 // ---> stream data parsing, json to struct
                 message_type msg = message_type::construct(json);
-                msg.insert_tick_data(bars_len, period, open_times, opens, highs, lows, closes, volumes);
-
+                msg.insert_tick_data(bars_len, open_times, opens, highs, lows, closes, volumes, time_data);
                 return cb(file_name, ec, std::move(err_msg), std::move(msg), opens, highs, lows, closes, volumes, open_times);
             }catch (const std::exception& e){
                 std::fprintf(stderr, "[%s] -> %s \n", __MAKE_FILELINE ,e.what());
@@ -438,19 +481,19 @@ public:
             return false;
         };
 
+        // websocket ping-pong cb
         auto cont_cb = [this](Websocket& ws)->void{
             exchange.control_msg(ws);
         };
 
         // ---> websocket 통신
         std::string s_channel = exchange.make_channel(pair, channel);
-        std::cout << "channel --> " << s_channel << std::endl;
         Websocket* ws_ptr = ws.get();
         ws_ptr->ws_start(
                 host,
                 port,
-                std::move(s_channel),
-                send_msg,
+                s_channel,
+                std::move(send_msg),
                 std::move(ws_cb),
                 std::move(cont_cb),
                 std::move(ws)
@@ -458,102 +501,269 @@ public:
 
     }
 
-public:
-    struct unix_time_data{
-        std::size_t year_start_unix;
-        std::size_t year_end_unix;
+    void init_tick_data(const std::size_t len){
+        bars_len = len;
+        open_times.clear();
+        opens.clear();
+        highs.clear();
+        lows.clear();
+        closes.clear();
 
-        std::size_t month_start_unix;
-        std::size_t month_end_unix;
-
-        std::size_t week_start_unix;
-        std::size_t week_end_unix;
-
-        std::size_t year;
-        std::size_t month;
-        std::size_t week;
-
-        int sum_months[13] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-
-        unix_time_data(){
-            std::istringstream iss(current_time());
-            int day;
-
-            iss >> month >> day >> year >> week;
-            month--, week--, day--;
-
-            time_t rawtime;
-            struct tm * timeinfo;
-
-
-            /* get current timeinfo: */
-            time ( &rawtime ); //or: rawtime = time(0);
-            /* convert to struct: */
-            timeinfo = localtime ( &rawtime );
-
-            /* now modify the timeinfo to the given date: */
-            timeinfo->tm_year   = year - 1900;
-            timeinfo->tm_mon    = 0;               //months since January - [0,11]
-            timeinfo->tm_mday   = 1;               //day of the month - [1,31]
-            timeinfo->tm_hour   = 0;               //hours since midnight - [0,23]
-            timeinfo->tm_min    = 0;               //minutes after the hour - [0,59]
-            timeinfo->tm_sec    = 0;               //seconds after the minute - [0,59]
-
-            /* call mktime: create unix time stamp from timeinfo struct */
-            year_start_unix = timegm( timeinfo );
-            int wight = 0;
-            if((year%4 == 0 && year%100 != 0) || year%400 == 0){
-                wight = 1;
-                for(int i = 2; i < 13; i++) sum_months[i]++;
-            }
-            year_end_unix = year_start_unix+(60*60*24*(wight+365));
-
-            month_start_unix = year_start_unix+(sum_months[month] * 60 * 60 * 24);
-            month_end_unix = year_start_unix+(sum_months[month+1] * 60 * 60 * 24);
-
-            std::size_t current_unix = month_start_unix+(60*60*24*day);
-            week_start_unix = current_unix-(week * 60 * 60 * 24);
-            week_end_unix = week_start_unix + (7 * 60 * 60 * 24);
+        if(bars_len > open_times.capacity()){
+            open_times.reserve(bars_len);
+            opens.reserve(bars_len);
+            highs.reserve(bars_len);
+            lows.reserve(bars_len);
+            closes.reserve(bars_len);
         }
-
-        bool is_closed(const std::size_t unix_time, const time_frame period){
-            bool is = false;
-            if(unix_time >= year_end_unix){
-                year_start_unix = year_end_unix;
-                year++;
-                int wight = 0;
-                if((year%4 == 0 && year%100 != 0) || year%400 == 0){
-                    wight = 1;
-                    for(int i = 2; i < 13; i++) sum_months[i]++;
-                }
-                year_end_unix = year_start_unix+(60*60*24*(wight+365));
-            }
-            if(unix_time >= month_end_unix){
-                month_start_unix = month_end_unix;
-                month = (month+1)%12;
-                month_end_unix = year_start_unix+(sum_months[month+1] * 60 * 60 * 24);
-                if(time_frame::_1M == period)
-                    is = true;
-            }
-            if(unix_time >= week_end_unix){
-                week_start_unix = week_end_unix;
-                week_end_unix = week_start_unix + (7 * 60 * 60 * 24);
-                if(time_frame::_1w == period)
-                    is = true;
-            }
-            return is;
-        }
-
-        std::string current_time() {
-            std::time_t t = std::time(nullptr);
-            std::tm* now = std::localtime(&t);
-            char buffer[128];
-            strftime(buffer, sizeof(buffer), "%m %d %Y %u", now);
-            return buffer;
-        }
-    };
+    }
 
 private:
+};
+
+class ExchangeManagement::rest_impl{
+private:
+    boost::asio::io_context& asio_context;
+    const std::string host;
+    const std::string port;
+    const std::string pk;
+    const std::string sk;
+    const std::size_t timeout;
+    const std::string client_user_agent;
+    ExchangeManagement& exchange;
+
+    boost::asio::ssl::context ssl_context;
+    boost::asio::ip::tcp::resolver resolver;
+    boost::beast::flat_buffer f_buffer;
+
+public:
+    rest_impl(ExchangeManagement& _exchange,
+              boost::asio::io_context& _context,
+              std::string _host,
+              std::string _port,
+              std::string _pk,
+              std::string _sk,
+              std::size_t _timeout,
+              std::string _client_user_agent)
+              : exchange(_exchange),
+              asio_context(_context),
+              host{std::move(_host)},
+              port{std::move(_port)},
+              pk{std::move(_pk)},
+              sk{std::move(_sk)},
+              timeout{_timeout},
+              client_user_agent{std::move(_client_user_agent)},
+              ssl_context{boost::asio::ssl::context::sslv23_client},
+              resolver{asio_context}
+    {}
+public:
+    using params_value_type = boost::variant<std::size_t, const char*>;
+    using params_type = std::pair<const char*, params_value_type>;
+    using init_list_Type = std::initializer_list<params_type>;
+
+    template<typename CB,
+            typename Args = typename boost::callable_traits::args<CB>::type,
+            typename R = typename std::tuple_element<3, Args>::type
+            >
+    ExchangeManagement::rest_result<R> post(bool _signed,
+                                            const char* target,
+                                            boost::beast::http::verb action,
+                                            const std::initializer_list<params_type>& map,
+                                            CB cb){
+
+        // --> variant value 확인
+        auto is_valid_params_value = [](const params_value_type& value) -> bool{
+            if(const auto *p = boost::get<const char*>(&value)) return *p != nullptr;
+            if(const auto *p = boost::get<std::size_t>(&value)) return *p != 0u;
+
+            assert(!"invalid params value type");
+            return false;
+        };
+
+        // --> variant value to str
+        auto variant_to_string = [](char* buffer, std::size_t buffer_size, const params_value_type& value) -> const char*{
+            // str to str
+            if(const auto *p = boost::get<const char*>(&value)) return *p;
+
+            // size_t to str
+            if(const auto *p = boost::get<std::size_t>(&value)){
+                std::snprintf(buffer, buffer_size, "%zu", *p);
+                return buffer;
+            }
+            assert(!"cant convert str");
+            return buffer;
+        };
+
+        auto is_html = [](const char *str) -> bool {
+            return std::strstr(str, "<HTML>")
+                   || std::strstr(str, "<HEAD>")
+                   || std::strstr(str, "<BODY>")
+                    ;
+        };
+
+        std::string post_url = target;
+        std::string params;
+
+        for(const auto& pair : map){
+            if(is_valid_params_value(pair.second)){
+                if(!params.empty()) params.append("&");
+                params.append(pair.first);
+                params.append("=");
+
+                char buffer[32];
+                params.append(variant_to_string(buffer, sizeof(buffer), pair.second));
+            }
+        }
+
+        std::cout << "params -> " << params << std::endl;
+
+        if(_signed){
+            assert(!pk.empty() && !sk.empty());
+            if(!params.empty()) params.append("&");
+            params.append(exchange.make_signed());
+        }
+
+        bool is_get_delete = (action == boost::beast::http::verb::get || action == boost::beast::http::verb::delete_);
+
+        if(is_get_delete && !params.empty()){
+            post_url.append("?");
+            post_url.append(params);
+            params.clear();
+        }
+
+        std::cout << "post url -> " << post_url << std::endl;
+        ExchangeManagement::rest_result<R> res{};
+
+        if(!cb){ // --> sync post
+            try{
+                ExchangeManagement::rest_result<std::string> r = sync_post(post_url.c_str(), action, std::move(params));
+
+                if(!r.v.empty() && is_html(r.v.c_str())){
+                    // ---> host error
+                    r.err_msg = std::move(r.v);
+                }else{
+                    std::string read_buffer = std::move(r.v);
+                    const flatjson::fjson json{read_buffer.c_str(), read_buffer.length()};
+                    if(json.error() != flatjson::FJ_EC_OK){
+                        // ---> json error
+                        res.ec = json.error();
+                        __MAKE_ERRMSG(res, json.error_string());
+                        res.replay.clear();
+
+                        return res;
+                    }
+
+                    if(json.is_object() && exchange.is_api_error(json)){
+                        // ---> request error
+                        auto info_error = exchange.info_api_error(json);
+                        res.ec = info_error.first;
+                        __MAKE_ERRMSG(res, info_error.second);
+                        res.replay.clear();
+
+                        return res;
+                    }else{
+                        // ---> json parsing
+                        res.v = R::construct(json);
+                    }
+                }
+
+            }catch (const std::exception& ex){
+                __MAKE_ERRMSG(res, ex.what())
+            }
+
+            return res;
+        }else{ // --> async post
+
+        }
+    }
+private:
+    ExchangeManagement::rest_result<std::string> sync_post(const char* post_url, boost::beast::http::verb action, std::string params){
+        ExchangeManagement::rest_result<std::string> res{};
+
+        /**
+         * boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
+         * --> TCP socket 객체를 감싸는 스트림, 모든 SSL/TLS 통신 연산 구현
+         */
+        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_stream(asio_context, ssl_context);
+
+        // ---> 접속 시도하는 서버에 domain name 세팅 함수
+        if(!SSL_set_tlsext_host_name(ssl_stream.native_handle(), host.c_str())){
+            boost::system::error_code ec{static_cast<int>(::ERR_get_error()), boost::asio::error::get_ssl_category()};
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        boost::system::error_code ec;
+        // ---> 항목 목록에 대한 쿼리에 정방향 분석을 동기 수행(호스트 이름 해석)
+        auto const result = resolver.resolve(host, port, ec);
+        if(ec){
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        // ---> 각 EndPoint에 순차적으로 시도하여 socket 연결
+        boost::asio::connect(ssl_stream.next_layer(), result.begin(), result.end(), ec);
+        if(ec){
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        // ---> ssl handle shake
+        ssl_stream.handshake(boost::asio::ssl::stream_base::client, ec);
+        if ( ec ) {
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        // ---> request format setting
+        boost::beast::http::request<boost::beast::http::string_body> req;
+        req.target(post_url);
+        req.version(11); // version 1.1
+        req.method(action);
+        if(action != boost::beast::http::verb::get){
+            req.body() = std::move(params);
+            req.set(boost::beast::http::field::content_length, std::to_string(req.body().length()));
+        }
+
+        req.insert("X-MBX-APIKEY", pk);
+        req.set(boost::beast::http::field::host, host);
+        req.set(boost::beast::http::field::user_agent, client_user_agent);
+        req.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
+
+        // --> send request
+        boost::beast::http::write(ssl_stream, req, ec);
+        if ( ec ) {
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        boost::beast::flat_buffer buffer;
+        boost::beast::http::response<boost::beast::http::string_body> resp;
+
+        // --> read response
+        boost::beast::http::read(ssl_stream, buffer, resp, ec);
+        if ( ec ) {
+            std::cerr << __MESSAGE("msg=" << ec.message()) << std::endl;
+
+            __MAKE_ERRMSG(res, ec.message());
+            return res;
+        }
+
+        res.v = std::move(resp.body());
+        //std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
+
+        // --> stream 에서 ssl을 종료
+        ssl_stream.shutdown(ec);
+
+        return res;
+    }
 };
 
 

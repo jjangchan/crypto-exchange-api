@@ -1,32 +1,34 @@
 //
-// Created by jjangchan on 2024/04/07.
+// Created by jjangchan on 2024/05/03.
 //
 
-#ifndef CRYPTO_EXCHANGE_API_BITHUMBAPI_H
-#define CRYPTO_EXCHANGE_API_BITHUMBAPI_H
+#ifndef CRYPTO_EXCHANGE_API_UPBITAPI_H
+#define CRYPTO_EXCHANGE_API_UPBITAPI_H
+
 
 #include "ExchangeManageMent.h"
 
 
-
-class BithumbAPI : public ExchangeManagement{
+class UpbitAPI: public ExchangeManagement{
 private:
 public:
-    using on_bithumb_cb = std::function<bool(const char* file_name,
-                                             int ec,
-                                             std::string err_msg,
-                                             bithumb::ticker msg,
-                                             const std::vector<double_type>& opens,
-                                             const std::vector<double_type>& highs,
-                                             const std::vector<double_type>& lows,
-                                             const std::vector<double_type>& closes,
-                                             const std::vector<double_type>& volumes,
-                                             const std::vector<std::size_t>& open_times)
+    using on_upbit_cb = std::function<bool(const char* file_name,
+                                           int ec,
+                                           std::string err_msg,
+                                           upbit::ticker msg,
+                                           const std::vector<double_type>& opens,
+                                           const std::vector<double_type>& highs,
+                                           const std::vector<double_type>& lows,
+                                           const std::vector<double_type>& closes,
+                                           const std::vector<double_type>& volumes,
+                                           const std::vector<std::size_t>& open_times)
     >;
-    using candlestick_cb = std::function<bool(const char* file_name,
+
+    using candles_cb = std::function<bool(const char* file_name,
                                          int ec,
                                          std::string err_msg,
-                                         bithumb::candlesticks_t res)>;
+                                         upbit::candles_t res)>;
+
     // constructor
     /**
      * @param _context     : asio context
@@ -39,15 +41,15 @@ public:
      * @param rest_timeout
      * @param rest_client_user_agent
      */
-    BithumbAPI(boost::asio::io_context& _context,
-               std::string ws_host,
-               std::string ws_port,
-               std::string rest_host,
-               std::string rest_port,
-               std::string rest_pk,
-               std::string rest_sk,
-               std::size_t rest_timeout,
-               std::string rest_client_user_agent)
+    UpbitAPI(boost::asio::io_context& _context,
+             std::string ws_host,
+             std::string ws_port,
+             std::string rest_host,
+             std::string rest_port,
+             std::string rest_pk,
+             std::string rest_sk,
+             std::size_t rest_timeout,
+             std::string rest_client_user_agent)
             : ExchangeManagement(_context,
                                  std::move(ws_host),
                                  std::move(ws_port),
@@ -59,34 +61,36 @@ public:
                                  std::move(rest_client_user_agent))
     {}
 
-    ~BithumbAPI(){}
-    BithumbAPI(BithumbAPI&& b_api) noexcept = default;
-    BithumbAPI(const BithumbAPI& b_api) = default;
+    ~UpbitAPI(){}
+    UpbitAPI(UpbitAPI&& b_api) noexcept = default;
+    UpbitAPI(const UpbitAPI& b_api) = default;
 
     // delete
-    BithumbAPI& operator=(const BithumbAPI& b_api) = delete;
-    BithumbAPI& operator=(BithumbAPI&& b_api) noexcept = delete;
+    UpbitAPI& operator=(const UpbitAPI& b_api) = delete;
+    UpbitAPI& operator=(UpbitAPI&& b_api) noexcept = delete;
 
 public:
 
-    bool is_api_error(const flatjson::fjson& json) override{
-        return json.contains("status") && json.contains("resmsg");
-    }
+    bool is_api_error(const flatjson::fjson& json) override{return json.contains("error");}
 
     std::pair<int, std::string> info_api_error(const flatjson::fjson& json) override{
-        int ec = json.at("status").to_int();
-        std::string msg = json.at("resmsg").to_string();
-        return std::make_pair(ec, std::move(msg));
+        auto error = json.at("error");
+        std::string msg = error.at("message").to_string();
+        std::string name = error.at("name").to_string();
+        msg.append("[");
+        msg.append(name);
+        msg.append("]");
+        return std::make_pair(400, std::move(msg));
     }
 
     std::string make_channel(const char* symbol, const char* channel) override{
-        // Bithumb raw streams -> /pub/ws
-        std::string str{"/pub/ws"};
+        // Upbit raw streams -> /websocket/v1
+        std::string str{"/websocket/v1"};
         return str;
     }
 
     void control_msg(Websocket& ws) override{
-        ws.ws_send_msg(boost::beast::websocket::ping_data{});
+        ws.ws_send_pong({});
     }
 
     std::string make_signed() override{
@@ -95,11 +99,9 @@ public:
         return _signed;
     }
 
-
     using send_value_type = boost::variant<std::vector<std::string>, const char*>;
     using send_type = std::pair<const char*, send_value_type>;
     using init_send_Type = std::initializer_list<send_type>;
-
     static std::string make_send_msg(const init_send_Type& map){
         // --> variant value 확인
         auto is_valid_params_value = [](const send_value_type& value) -> bool{
@@ -136,51 +138,57 @@ public:
             assert(!"cant convert str");
             return "";
         };
-        std::string send_msg = "{";
-
+        std::string send_msg = "[";
         for(const auto& pair : map){
             if(is_valid_params_value(pair.second)){
                 if(send_msg.size() > 1) send_msg.push_back(',');
+                if(pair.first != "codes")
+                    send_msg.push_back('{');
                 send_msg.push_back(34);
                 send_msg.append(pair.first);
                 send_msg.push_back(34);
                 send_msg.push_back(':');
                 send_msg.append(variant_to_string(pair.second));
+                if(pair.first != "type")
+                    send_msg.push_back('}');
             }
         }
-        send_msg.push_back('}');
+        send_msg.push_back(']');
         return send_msg;
     }
 
-    ExchangeManagement::handler bithumb_on_tick(const char* pair,
-                                                const bithumb::time_frame period,
-                                                std::size_t bar_len,
-                                                std::string send_msg,
-                                                on_bithumb_cb ws_cb,
-                                                candlestick_cb c_cb = {}){
+    ExchangeManagement::handler upbit_on_tick(const char* pair,
+                                              const upbit::time_frame period,
+                                              std::size_t bar_len,
+                                              std::string send_msg,
+                                              on_upbit_cb on_cb,
+                                              candles_cb c_cb = {}){
 
-        const char* interval = bithumb::time_frame_to_string(period);
+        std::string target = "/v1/candles/";
+        target.append(upbit::time_frame_to_string(period));
 
-        std::string target = "/public/candlestick/";
-        target.append(pair);
-        target.append("/");
-        target.append(interval);
+        const rest_impl::init_list_Type map = {
+                {"market", pair},
+                {"count", bar_len},
+        };
 
-        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, {}, std::move(c_cb));
-
-        std::size_t t_period = static_cast<std::underlying_type<bithumb::time_frame>::type>(period);
+        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, map, std::move(c_cb));
+        std::size_t t_period = static_cast<std::underlying_type<upbit::time_frame>::type>(period);
         unix_time_data time_data(t_period);
 
         if(!res){
-            std::cerr << "get candlestick error: " << res.err_msg << std::endl;
+            std::cerr << "get klines error: " << res.err_msg << std::endl;
         }else{
-            //std::cout << res.v << std::endl;
+            std::cout << res.v << std::endl;
         }
         ws_pimpl->init_tick_data(bar_len);
-        return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(ws_cb), res);
+        return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(on_cb), res);
     }
-
 private:
 };
 
-#endif //CRYPTO_EXCHANGE_API_BITHUMBAPI_H
+
+
+
+
+#endif //CRYPTO_EXCHANGE_API_UPBITAPI_H

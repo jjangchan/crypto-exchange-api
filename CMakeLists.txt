@@ -22,7 +22,9 @@ SET(SRC
         src/ExchangeManageMent.h
         src/Errors.h
         src/BinanceAPI.h
-        src/ExchangeType.h src/BithumbAPI.h)
+        src/ExchangeType.h
+        src/BithumbAPI.h
+        src/UpbitAPI.h)
 
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
 include_directories(../include )
