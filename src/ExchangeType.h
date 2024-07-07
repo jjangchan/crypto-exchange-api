@@ -383,6 +383,16 @@ namespace binance{
                 closes.push_back(c);
                 highs.push_back(h);
                 volumes.push_back(v);
+
+                len = open_times.size();
+                std::size_t b_len = len >= bars_len ? len-2 : len-1;
+                std::cout <<
+                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
+                          "o -- > " << opens[b_len] << "\n" <<
+                          "h -- > " << highs[b_len] << "\n" <<
+                          "l -- > " << lows[b_len] << "\n" <<
+                          "c -- > " << closes[b_len] << "\n" <<
+                          "==============================================================" << std::endl;
                 return;
             }
             opens[len-1] = o;
@@ -661,13 +671,16 @@ namespace bithumb {
                 highs.push_back(closePrice);
                 closes.push_back(closePrice);
                 volumes.push_back(volume);
+
+                len = open_times.size();
+                std::size_t b_len = len >= bars_len ? len-2 : len-1;
                 std::cout <<
                     "T -- > " << unix_time << "\n" <<
-                    "t -- > " << (open_times[len-2]/1000) << "\n" <<
-                    "o -- > " << opens[len-2] << "\n" <<
-                    "h -- > " << highs[len-2] << "\n" <<
-                    "l -- > " << lows[len-2] << "\n" <<
-                    "c -- > " << closes[len-2] << "\n" <<
+                    "t -- > " << (open_times[b_len]/1000) << "\n" <<
+                    "o -- > " << opens[b_len] << "\n" <<
+                    "h -- > " << highs[b_len] << "\n" <<
+                    "l -- > " << lows[b_len] << "\n" <<
+                    "c -- > " << closes[b_len] << "\n" <<
                     "==============================================================" << std::endl;
                 return;
             }
@@ -683,7 +696,7 @@ namespace bithumb {
             volumes[len - 1] = volume;
         }
 
-        //friend std::ostream &operator<<(std::ostream &os, const kline_t &o);
+        friend std::ostream &operator<<(std::ostream &os, const ticker &o);
     };
 
     std::ostream &operator<<(std::ostream &os, const ticker &o) {
@@ -937,15 +950,16 @@ namespace upbit{
                 closes.push_back(trade_price);
                 volumes.push_back(trade_volume);
 
-                len = open_times.size()-1;
+                len = open_times.size();
+                std::size_t b_len = len >= bars_len ? len-2 : len-1;
                 std::cout <<
                           "T -- > " << unix_time << "\n" <<
-                          "t -- > " << (open_times[len-1]/1000) << "\n" <<
-                          "o -- > " << opens[len-1] << "\n" <<
-                          "h -- > " << highs[len-1] << "\n" <<
-                          "l -- > " << lows[len-1] << "\n" <<
-                          "c -- > " << closes[len-1] << "\n" <<
-                          "v -- > " << volumes[len-1] << "\n" <<
+                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
+                          "o -- > " << opens[b_len] << "\n" <<
+                          "h -- > " << highs[b_len] << "\n" <<
+                          "l -- > " << lows[b_len] << "\n" <<
+                          "c -- > " << closes[b_len] << "\n" <<
+                          "v -- > " << volumes[b_len] << "\n" <<
                           "==============================================================" << std::endl;
                 return;
             }
@@ -1016,8 +1030,6 @@ namespace upbit{
                             std::vector<double_type>& volumes){
             std::size_t index = candles.size();
             size_t end = bars_len >= index ? 1 : index-bars_len;
-
-            std::cout << "size -> " << index << " , end -> " << end << std::endl;
             while(index >= end){
                 --index;
                 open_times.push_back(candles[index].timestamp);
@@ -1043,6 +1055,236 @@ namespace upbit{
                "l [" << i << "] -> " << s.candles[i].low_price << "\n" <<
                "c [" << i << "] -> " << s.candles[i].trade_price << "\n" <<
                "v [" << i << "] -> " << s.candles[i].candle_acc_trade_volume << "\n" <<
+               "==============================================" << "\n";
+        }
+        return os;
+    }
+
+}
+
+/**********************************************************************************************************************/
+
+namespace coinbase{
+    enum class time_frame : int{
+        // mins
+        _1m = 1*60,
+        _5m = 5*60,
+        _15m = 15*60,
+
+        // hours
+        _1h = 1*60*60,
+        _6h = 6*60*60,
+
+        // other
+        _1d = 24*60*60,
+    };
+
+    static const char* time_frame_to_string(time_frame tf){
+        switch(tf){
+            case time_frame::_1m : return "60";
+            case time_frame::_5m : return "300";
+            case time_frame::_15m : return "900";
+            case time_frame::_1h : return "3600";
+            case time_frame::_6h : return "21600";
+            case time_frame::_1d : return "86400";
+        }
+        return "60";
+    }
+
+/**********************************************************************************************************************/
+//https://docs.cdp.coinbase.com/advanced-trade/docs/ws-channels/#candles-channel
+    struct ticker{
+        std::string type;
+        std::size_t sequence;
+        std::string product_id;
+        double_type price;
+        double_type last_size;
+        std::string time;
+
+        static ticker construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            ticker res{};
+            // ---> candle data parse
+            __JSON_PARSE(res, product_id, json);
+            __JSON_PARSE(res, price, json);
+            __JSON_PARSE(res, last_size, json);
+            __JSON_PARSE(res, time, json);
+            res.time.erase((res.time.begin()+res.time.find('.')), res.time.end());
+            res.time.erase(std::remove_if(res.time.begin(), res.time.end(),
+                                      [](unsigned char x){return x == '-' || x == ':' || x == 'T';}),
+                       res.time.end());
+            return res;
+        }
+
+        void insert_tick_data(const std::size_t bars_len,
+                              std::vector<std::size_t> &open_times,
+                              std::vector<double_type> &opens,
+                              std::vector<double_type> &highs,
+                              std::vector<double_type> &lows,
+                              std::vector<double_type> &closes,
+                              std::vector<double_type> &volumes,
+                              unix_time_data& td) {
+
+            std::size_t len = open_times.size();
+            std::size_t unix_time, kline_time = 0;
+            std::size_t i_time = std::stoul(time);
+
+            size_t y, M, d, h, m, s;
+            y = (i_time/10000000000), M = (i_time/100000000)%100, d = (i_time/1000000)%100;
+            bool x = false;
+
+            if(td.period == 0) {
+                unix_time = unix_time_data::get_gmt_unix_time(y, M - 1, d);
+                kline_time = td.month_start_unix;
+                x = td.is_closed(unix_time);
+                if (x) {
+                    kline_time = td.month_start_unix;
+                }
+            }else{
+                h = (i_time/10000)%100, m = (i_time/100)%100, s = i_time%100;
+                unix_time = unix_time_data::get_gmt_unix_time(y, M-1, d, h, m, s);
+                std::size_t interval = static_cast<std::underlying_type<time_frame>::type>(td.period);
+                kline_time = (unix_time/interval)*interval;
+                if(!open_times.empty()){
+                    std::size_t kline_end = (open_times[len-1]/1000)+interval;
+                    if(unix_time >= kline_end){
+                        x = true;
+                        kline_time = kline_end;
+                    }
+                }
+            }
+
+            kline_time *= 1000;
+
+            if (open_times.empty()) {
+                open_times.push_back(kline_time);
+                opens.push_back(price);
+                lows.push_back(price);
+                closes.push_back(price);
+                highs.push_back(price);
+                volumes.push_back(last_size);
+                return;
+            }
+
+            if (x) { // ---> new candle
+                if(len >= bars_len){
+                    for(std::size_t index = 0; index < len-1; index++){
+                        open_times[index] = open_times[index+1];
+                        opens[index] = opens[index+1];
+                        lows[index] = lows[index+1];
+                        closes[index] = closes[index+1];
+                        highs[index] = highs[index+1];
+                        volumes[index] = volumes[index+1];
+                    }
+                    open_times.pop_back();
+                    opens.pop_back();
+                    lows.pop_back();
+                    closes.pop_back();
+                    highs.pop_back();
+                    volumes.pop_back();
+                }
+
+                open_times.push_back(kline_time);
+                opens.push_back(price);
+                lows.push_back(price);
+                highs.push_back(price);
+                closes.push_back(price);
+                volumes.push_back(last_size);
+
+                std::size_t b_len = len >= bars_len ? len-2 : len-1;
+                std::cout <<
+                          "T -- > " << unix_time << "\n" <<
+                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
+                          "o -- > " << opens[b_len] << "\n" <<
+                          "h -- > " << highs[b_len] << "\n" <<
+                          "l -- > " << lows[b_len] << "\n" <<
+                          "c -- > " << closes[b_len] << "\n" <<
+                          "==============================================================" << std::endl;
+                return;
+            }
+
+            if(price >= highs[len-1]){
+                highs[len-1] = price;
+            }
+
+            if(price <= lows[len-1]){
+                lows[len-1] = price;
+            }
+            closes[len - 1] = price;
+            volumes[len - 1] += last_size;
+        }
+
+    };
+
+/**********************************************************************************************************************/
+//https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles/
+    struct candles_t{
+        struct candle_t{
+            std::size_t timestamp;
+            double_type low;
+            double_type high;
+            double_type open;
+            double_type close;
+            double_type volume;
+        };
+
+        std::vector<candle_t> candles;
+        static candles_t construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            candles_t res{};
+            for(std::size_t i = 0u; i < json.size(); i++){
+                candle_t item{};
+                const auto it = json.at(i);
+                assert(it.is_array());
+
+                item.timestamp = it.at(0).to<std::size_t>();
+                item.low.assign(it.at(1).to_string());
+                item.high.assign(it.at(2).to_string());
+                item.open.assign(it.at(3).to_string());
+                item.close.assign(it.at(4).to_string());
+                item.volume.assign(it.at(5).to_string());
+
+                res.candles.push_back(std::move(item));
+            }
+
+            return res;
+        }
+
+        void init_tick_data(const std::size_t bars_len,
+                            std::vector<std::size_t>& open_times,
+                            std::vector<double_type>& opens,
+                            std::vector<double_type>& highs,
+                            std::vector<double_type>& lows,
+                            std::vector<double_type>& closes,
+                            std::vector<double_type>& volumes){
+            std::size_t index = candles.size();
+            size_t end = bars_len >= index ? 1 : index-bars_len;
+            while(index >= end){
+                --index;
+                open_times.push_back(candles[index].timestamp*1000);
+                opens.push_back(candles[index].open);
+                highs.push_back(candles[index].high);
+                lows.push_back(candles[index].low);
+                closes.push_back(candles[index].close);
+                volumes.push_back(candles[index].volume);
+            }
+
+        }
+
+        friend std::ostream &operator<<(std::ostream &os, const candles_t& s);
+
+    };
+
+    std::ostream& operator<<(std::ostream &os, const candles_t& s){
+        os << "bar size -> " << s.candles.size() << "\n";
+        for(int i = 0; i < s.candles.size(); ++i){
+            os <<
+               "t [" << i << "] -> " << s.candles[i].timestamp << "\n" <<
+               "o [" << i << "] -> " << s.candles[i].open << "\n" <<
+               "h [" << i << "] -> " << s.candles[i].high << "\n" <<
+               "l [" << i << "] -> " << s.candles[i].low << "\n" <<
+               "c [" << i << "] -> " << s.candles[i].close << "\n" <<
+               "v [" << i << "] -> " << s.candles[i].volume << "\n" <<
                "==============================================" << "\n";
         }
         return os;

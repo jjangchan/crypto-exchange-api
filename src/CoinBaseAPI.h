@@ -1,33 +1,29 @@
 //
-// Created by jjangchan on 2024/05/03.
+// Created by jjangchan on 2024/05/31.
 //
 
-#ifndef CRYPTO_EXCHANGE_API_UPBITAPI_H
-#define CRYPTO_EXCHANGE_API_UPBITAPI_H
-
-
+#ifndef CRYPTO_EXCHANGE_API_COINBASEAPI_H
+#define CRYPTO_EXCHANGE_API_COINBASEAPI_H
 #include "ExchangeManageMent.h"
 
-
-class UpbitAPI: public ExchangeManagement{
-private:
+class CoinBaseAPI : public ExchangeManagement{
 public:
-    using on_upbit_cb = std::function<bool(const char* file_name,
-                                           int ec,
-                                           std::string err_msg,
-                                           upbit::ticker msg,
-                                           const std::vector<double_type>& opens,
-                                           const std::vector<double_type>& highs,
-                                           const std::vector<double_type>& lows,
-                                           const std::vector<double_type>& closes,
-                                           const std::vector<double_type>& volumes,
-                                           const std::vector<std::size_t>& open_times)
+    using on_coinbase_cb = std::function<bool(const char* file_name,
+                                             int ec,
+                                             std::string err_msg,
+                                             coinbase::ticker msg,
+                                             const std::vector<double_type>& opens,
+                                             const std::vector<double_type>& highs,
+                                             const std::vector<double_type>& lows,
+                                             const std::vector<double_type>& closes,
+                                             const std::vector<double_type>& volumes,
+                                             const std::vector<std::size_t>& open_times)
     >;
 
     using candles_cb = std::function<bool(const char* file_name,
                                          int ec,
                                          std::string err_msg,
-                                         upbit::candles_t res)>;
+                                         coinbase::candles_t res)>;
 
     // constructor
     /**
@@ -41,15 +37,15 @@ public:
      * @param rest_timeout
      * @param rest_client_user_agent
      */
-    UpbitAPI(boost::asio::io_context& _context,
-             std::string ws_host,
-             std::string ws_port,
-             std::string rest_host,
-             std::string rest_port,
-             std::string rest_pk,
-             std::string rest_sk,
-             std::size_t rest_timeout,
-             std::string rest_client_user_agent)
+    CoinBaseAPI(boost::asio::io_context& _context,
+               std::string ws_host,
+               std::string ws_port,
+               std::string rest_host,
+               std::string rest_port,
+               std::string rest_pk,
+               std::string rest_sk,
+               std::size_t rest_timeout,
+               std::string rest_client_user_agent)
             : ExchangeManagement(_context,
                                  std::move(ws_host),
                                  std::move(ws_port),
@@ -61,32 +57,29 @@ public:
                                  std::move(rest_client_user_agent))
     {}
 
-    ~UpbitAPI(){}
-    UpbitAPI(UpbitAPI&& b_api) noexcept = default;
-    UpbitAPI(const UpbitAPI& b_api) = default;
+    ~CoinBaseAPI(){}
+    CoinBaseAPI(CoinBaseAPI&& cb_api) noexcept = default;
+    CoinBaseAPI& operator=(CoinBaseAPI&& cb_api) noexcept = default;
 
     // delete
-    UpbitAPI& operator=(const UpbitAPI& b_api) = delete;
-    UpbitAPI& operator=(UpbitAPI&& b_api) noexcept = delete;
+    CoinBaseAPI& operator=(const CoinBaseAPI& cb_api) = delete;
+    CoinBaseAPI(const CoinBaseAPI& cb_api) = delete;
 
 public:
 
-    bool is_api_error(const flatjson::fjson& json) override{return json.contains("error");}
+    bool is_api_error(const flatjson::fjson& json) override{return json.contains("message") || json.contains("channels");}
 
     std::pair<int, std::string> info_api_error(const flatjson::fjson& json) override{
-        auto error = json.at("error");
-        std::string msg = error.at("message").to_string();
-        std::string name = error.at("name").to_string();
+        if(json.contains("channels")) return std::make_pair(0, "ok");
+        std::string msg = json.at("message").to_string();
         msg.append("[");
-        msg.append(name);
+        msg.append(msg);
         msg.append("]");
         return std::make_pair(400, std::move(msg));
     }
 
     std::string make_channel(const char* symbol, const char* channel) override{
-        // Upbit raw streams -> /websocket/v1
-        std::string str{"/websocket/v1"};
-        return str;
+        return "/";
     }
 
     void control_msg(Websocket& ws) override{
@@ -138,57 +131,52 @@ public:
             assert(!"cant convert str");
             return "";
         };
-        std::string send_msg = "[";
+
+        std::string send_msg = "{";
         for(const auto& pair : map){
             if(is_valid_params_value(pair.second)){
                 if(send_msg.size() > 1) send_msg.push_back(',');
-                if(pair.first != "codes")
-                    send_msg.push_back('{');
                 send_msg.push_back(34);
                 send_msg.append(pair.first);
                 send_msg.push_back(34);
                 send_msg.push_back(':');
                 send_msg.append(variant_to_string(pair.second));
-                if(pair.first != "type")
-                    send_msg.push_back('}');
             }
         }
-        send_msg.push_back(']');
+        send_msg.push_back('}');
         return send_msg;
     }
 
-    ExchangeManagement::handler upbit_on_tick(const char* pair,
-                                              const upbit::time_frame period,
-                                              std::size_t bar_len,
-                                              std::string send_msg,
-                                              on_upbit_cb on_cb,
-                                              candles_cb c_cb = {}){
+    ExchangeManagement::handler coinbase_on_tick(const char* pair,
+                                                const coinbase::time_frame period,
+                                                std::size_t bar_len,
+                                                std::string send_msg,
+                                                on_coinbase_cb on_cb,
+                                                candles_cb k_cb = {}){
 
-        std::string target = "/v1/candles/";
-        target.append(upbit::time_frame_to_string(period));
+        const char* granularity = coinbase::time_frame_to_string(period);
 
         const rest_impl::init_list_Type map = {
-                {"market", pair},
-                {"count", bar_len},
+                {"granularity", granularity},
         };
 
-        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, map, std::move(c_cb));
-        std::size_t t_period = static_cast<std::underlying_type<upbit::time_frame>::type>(period);
+        std::string target = "/products/";
+        target.append(pair);
+        target.append("/candles");
+
+        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, map, std::move(k_cb));
+        std::size_t t_period = static_cast<std::underlying_type<coinbase::time_frame>::type>(period);
         unix_time_data time_data(t_period);
 
         if(!res){
-            std::cerr << "upbit rest error: " << res.err_msg << std::endl;
+            std::cerr << "coinbase rest error: " << res.err_msg << std::endl;
         }else{
-            std::cout << res.v << std::endl;
+            //std::cout << res.v << std::endl;
         }
         ws_pimpl->init_tick_data(bar_len);
         return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(on_cb), res);
     }
+
 private:
 };
-
-
-
-
-
-#endif //CRYPTO_EXCHANGE_API_UPBITAPI_H
+#endif //CRYPTO_EXCHANGE_API_COINBASEAPI_H

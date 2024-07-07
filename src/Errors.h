@@ -300,4 +300,27 @@ const char* bithumb_error_to_string(bithumb_error e){
 
 /*************************************************************************************************/
 
+enum class coinbase_error : int{
+    OK = 0,
+    USER_REJECTED_REQUEST = 4001,
+    UNAUTHORIZED = 4100,
+    UNSUPPORTED_METHOD = 4200,
+    DISCONNECTED = 4900,
+    CHAIN_DISCONNECTED = 4901,
+};
+
+const char* coinbase_error_to_string(coinbase_error e){
+    switch ( e ) {
+        case coinbase_error::OK : return "OK";
+        case coinbase_error::USER_REJECTED_REQUEST : return "USER_REJECTED_REQUEST";
+        case coinbase_error::UNAUTHORIZED : return "UNAUTHORIZED";
+        case coinbase_error::UNSUPPORTED_METHOD : return "UNSUPPORTED_METHOD";
+        case coinbase_error::DISCONNECTED : return "DISCONNECTED";
+        case coinbase_error::CHAIN_DISCONNECTED : return "CHAIN_DISCONNECTED";
+    }
+    return "UNKNOWN_ERROR";
+}
+
+/*************************************************************************************************/
+
 #endif //MAIN_CPP_ERRORS_H

@@ -172,7 +172,7 @@ public:
         unix_time_data time_data(t_period);
 
         if(!res){
-            std::cerr << "get candlestick error: " << res.err_msg << std::endl;
+            std::cerr << "bithumb rest error: " << res.err_msg << std::endl;
         }else{
             //std::cout << res.v << std::endl;
         }

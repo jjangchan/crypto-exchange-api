@@ -118,7 +118,7 @@ public:
         unix_time_data time_data;
 
         if(!res){
-            std::cerr << "get klines error: " << res.err_msg << std::endl;
+            std::cerr << "binance rest error: " << res.err_msg << std::endl;
         }else{
             //std::cout << res.v << std::endl;
         }
