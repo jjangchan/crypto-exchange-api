@@ -123,7 +123,7 @@ public:
     }
 
     template<typename S>
-    void ws_send_msg(const S& msg){
+    void ws_write_msg(const S& msg){
         w_socket.async_write(
                 boost::asio::buffer(msg),
                 [this](boost::system::error_code ec, std::size_t rd) {}

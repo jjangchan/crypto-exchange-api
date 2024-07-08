@@ -27,7 +27,11 @@ SET(SRC
         src/UpbitAPI.h src/CoinBaseAPI.h)
 
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
-include_directories(../include )
+include_directories(include)
+
+if(LINUX)
+    link_libraries(uuid)
+endif()
 
 add_executable(crypto_exchange_api ${SRC})
 
@@ -65,7 +69,7 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 set(Boost_NO_BOOST_CMAKE         ON)
 find_package(Boost
-        1.82.0
+        1.79.0
         COMPONENTS
         program_options
         thread

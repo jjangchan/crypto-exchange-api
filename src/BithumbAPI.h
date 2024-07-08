@@ -86,7 +86,7 @@ public:
     }
 
     void control_msg(Websocket& ws) override{
-        ws.ws_send_msg(boost::beast::websocket::ping_data{});
+        ws.ws_write_msg(std::string{});
     }
 
     std::string make_signed() override{
