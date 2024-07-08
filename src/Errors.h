@@ -7,6 +7,21 @@
 
 #include "flatjson.hpp"
 
+#define __STRINGIZE_I(x) #x
+#define __STRINGIZE(x) __STRINGIZE_I(x)
+
+// file name ( line )
+#define __MAKE_FILELINE \
+    __FILE__ "(" __STRINGIZE(__LINE__) ")"
+
+#define __MESSAGE(msg) \
+    std::strrchr(__FILE__, '/')+1 << "(" __STRINGIZE(__LINE__) "): " << msg << std::flush
+
+#define __MAKE_ERRMSG(res, msg) \
+    res.err_msg = __MAKE_FILELINE; \
+    res.err_msg += ": "; \
+    res.err_msg += msg;
+
 namespace error{
 namespace binance{}
 //namespace coinone{}
@@ -103,6 +118,63 @@ const char* binance_error_to_string(binance_error e){
     return "UNKNOWN_ERROR";
 }
 
+<<<<<<< HEAD
+=======
+/*************************************************************************************************/
+// https://docs.upbit.com/v1.4.0/reference/websocket-error
+// https://docs.upbit.com/v1.4.0/docs/api-%EC%A3%BC%EC%9A%94-%EC%97%90%EB%9F%AC-%EC%BD%94%EB%93%9C-%EB%AA%A9%EB%A1%9D
+enum class upbit_error : int{
+    OK = 0,
+    CREATE_ASK_ERROR = 1,
+    CREATE_BID_ERROR = 2,
+    INSUFFICIENT_FUNDS_ASK = 3,
+    INSUFFICIENT_FUNDS_BID = 4,
+    UNDER_MIN_TOTAL_ASK = 5,
+    UNDER_MIN_TOTAL_BID = 6,
+    WITHDRAW_ADDRESS_NOT_REGISTERD = 7,
+    VALIDATION_ERROR = 8,
+    INVALID_QUERY_PAYLOAD = 9,
+    JWT_VERIFICATION = 10,
+    EXPIRED_ACCESS_KEY = 11,
+    NONCE_USED = 12,
+    NO_AUTHORIZATION_I_P = 13,
+    OUT_OF_SCOPE = 14,
+    INVALID_AUTH = 15,
+    WRONG_FORMAT = 16,
+    NO_TICKET = 17,
+    NO_TYPE = 18,
+    NO_CODES = 19,
+    INVALID_PARAM = 20
+
+};
+
+const char* upbit_error_to_string(const upbit_error e){
+    switch (e) {
+        case upbit_error::OK : return "OK";
+        case upbit_error::CREATE_ASK_ERROR : return "CREATE_ASK_ERROR";
+        case  upbit_error::CREATE_BID_ERROR : return "CREATE_BID_ERROR";
+        case  upbit_error::INSUFFICIENT_FUNDS_ASK : return "INSUFFICIENT_FUNDS_ASK";
+        case  upbit_error::INSUFFICIENT_FUNDS_BID : return "INSUFFICIENT_FUNDS_BID";
+        case  upbit_error::UNDER_MIN_TOTAL_ASK : return "UNDER_MIN_TOTAL_ASK";
+        case  upbit_error::UNDER_MIN_TOTAL_BID : return "UNDER_MIN_TOTAL_BID";
+        case  upbit_error::WITHDRAW_ADDRESS_NOT_REGISTERD : return "WITHDRAW_ADDRESS_NOT_REGISTERD";
+        case  upbit_error::VALIDATION_ERROR : return "VALIDATION_ERROR";
+        case  upbit_error::INVALID_QUERY_PAYLOAD : return "INVALID_QUERY_PAYLOAD";
+        case  upbit_error::JWT_VERIFICATION : return "JWT_VERIFICATION";
+        case  upbit_error::EXPIRED_ACCESS_KEY : return "EXPIRED_ACCESS_KEY";
+        case  upbit_error::NONCE_USED : return "NONCE_USED";
+        case  upbit_error::NO_AUTHORIZATION_I_P : return "NO_AUTHORIZATION_I_P";
+        case  upbit_error::OUT_OF_SCOPE : return "OUT_OF_SCOPE";
+        case  upbit_error::INVALID_AUTH : return "INVALID_AUTH";
+        case  upbit_error::WRONG_FORMAT : return "WRONG_FORMAT";
+        case  upbit_error::NO_TICKET : return "NO_TICKET";
+        case  upbit_error::NO_TYPE : return "NO_TYPE";
+        case  upbit_error::NO_CODES : return "NO_CODES";
+        case  upbit_error::INVALID_PARAM : return "INVALID_PARAM";
+    }
+}
+
+>>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
 
 /*************************************************************************************************/
 // https://docs.coinone.co.kr/docs/error-code
@@ -211,6 +283,7 @@ enum class bithumb_error : int{
     ETC = 5600,
     UNKNOWN_ERROR = 5900,
     NOT_GET_PRICE = 3000
+<<<<<<< HEAD
 };
 
 const char* bithumb_error_to_string(bithumb_error e){
@@ -225,6 +298,45 @@ const char* bithumb_error_to_string(bithumb_error e){
         case bithumb_error::ETC : return "ETC";
         case bithumb_error::UNKNOWN_ERROR : return "UNKNOWN_ERROR";
         case bithumb_error::NOT_GET_PRICE : return "NOT_GET_PRICE";
+=======
+};
+
+const char* bithumb_error_to_string(bithumb_error e){
+    switch ( e ) {
+        case bithumb_error::OK : return "OK";
+        case bithumb_error::BAD_REQUEST : return "BAD_REQUEST";
+        case bithumb_error::NOT_MEMBER : return "NOT_MEMBER";
+        case bithumb_error::INVALID_APIKEY : return "INVALID_APIKEY";
+        case bithumb_error::METHOD_NOT_ALLOWED : return "METHOD_NOT_ALLOWED";
+        case bithumb_error::DATABASE_FAIL : return "DATABASE_FAIL";
+        case bithumb_error::INVALID_PARAMETER : return "INVALID_PARAMETER";
+        case bithumb_error::ETC : return "ETC";
+        case bithumb_error::UNKNOWN_ERROR : return "UNKNOWN_ERROR";
+        case bithumb_error::NOT_GET_PRICE : return "NOT_GET_PRICE";
+    }
+    return "UNKNOWN_ERROR";
+}
+
+/*************************************************************************************************/
+
+enum class coinbase_error : int{
+    OK = 0,
+    USER_REJECTED_REQUEST = 4001,
+    UNAUTHORIZED = 4100,
+    UNSUPPORTED_METHOD = 4200,
+    DISCONNECTED = 4900,
+    CHAIN_DISCONNECTED = 4901,
+};
+
+const char* coinbase_error_to_string(coinbase_error e){
+    switch ( e ) {
+        case coinbase_error::OK : return "OK";
+        case coinbase_error::USER_REJECTED_REQUEST : return "USER_REJECTED_REQUEST";
+        case coinbase_error::UNAUTHORIZED : return "UNAUTHORIZED";
+        case coinbase_error::UNSUPPORTED_METHOD : return "UNSUPPORTED_METHOD";
+        case coinbase_error::DISCONNECTED : return "DISCONNECTED";
+        case coinbase_error::CHAIN_DISCONNECTED : return "CHAIN_DISCONNECTED";
+>>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
     }
     return "UNKNOWN_ERROR";
 }

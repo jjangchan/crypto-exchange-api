@@ -1,24 +1,17 @@
 //
-// Created by jjangchan on 2024/04/07.
+// Created by jjangchan on 2024/05/31.
 //
 
-#ifndef CRYPTO_EXCHANGE_API_BITHUMBAPI_H
-#define CRYPTO_EXCHANGE_API_BITHUMBAPI_H
-
+#ifndef CRYPTO_EXCHANGE_API_COINBASEAPI_H
+#define CRYPTO_EXCHANGE_API_COINBASEAPI_H
 #include "ExchangeManageMent.h"
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
-class BithumbAPI : public ExchangeManagement{
-private:
+class CoinBaseAPI : public ExchangeManagement{
 public:
-    using on_bithumb_cb = std::function<bool(const char* file_name,
+    using on_coinbase_cb = std::function<bool(const char* file_name,
                                              int ec,
                                              std::string err_msg,
-                                             bithumb::ticker msg,
+                                             coinbase::ticker msg,
                                              const std::vector<double_type>& opens,
                                              const std::vector<double_type>& highs,
                                              const std::vector<double_type>& lows,
@@ -26,25 +19,12 @@ public:
                                              const std::vector<double_type>& volumes,
                                              const std::vector<std::size_t>& open_times)
     >;
-<<<<<<< HEAD
-    // constructor
-    BithumbAPI(boost::asio::io_context& _context,
-               std::string _host,
-               std::string _port,
-               std::string _send_msg,
-               std::size_t kline_size)
-            : ExchangeManagement(_context, std::move(_host), std::move(_port), std::move(_send_msg), kline_size){}
 
-    ~BithumbAPI(){}
-    BithumbAPI(BithumbAPI&& b_api) noexcept = default;
-
-    // delete
-    BithumbAPI(const BithumbAPI& b_api) = delete;
-=======
-    using candlestick_cb = std::function<bool(const char* file_name,
+    using candles_cb = std::function<bool(const char* file_name,
                                          int ec,
                                          std::string err_msg,
-                                         bithumb::candlesticks_t res)>;
+                                         coinbase::candles_t res)>;
+
     // constructor
     /**
      * @param _context     : asio context
@@ -57,7 +37,7 @@ public:
      * @param rest_timeout
      * @param rest_client_user_agent
      */
-    BithumbAPI(boost::asio::io_context& _context,
+    CoinBaseAPI(boost::asio::io_context& _context,
                std::string ws_host,
                std::string ws_port,
                std::string rest_host,
@@ -77,76 +57,44 @@ public:
                                  std::move(rest_client_user_agent))
     {}
 
-    ~BithumbAPI(){}
-    BithumbAPI(BithumbAPI&& b_api) noexcept = default;
-    BithumbAPI(const BithumbAPI& b_api) = default;
+    ~CoinBaseAPI(){}
+    CoinBaseAPI(CoinBaseAPI&& cb_api) noexcept = default;
+    CoinBaseAPI& operator=(CoinBaseAPI&& cb_api) noexcept = default;
 
     // delete
->>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
-    BithumbAPI& operator=(const BithumbAPI& b_api) = delete;
-    BithumbAPI& operator=(BithumbAPI&& b_api) noexcept = delete;
+    CoinBaseAPI& operator=(const CoinBaseAPI& cb_api) = delete;
+    CoinBaseAPI(const CoinBaseAPI& cb_api) = delete;
 
 public:
 
-<<<<<<< HEAD
-    bool is_api_error(const flatjson::fjson& json) override{return json.contains("status") && json.contains("resmsg");}
-=======
-    bool is_api_error(const flatjson::fjson& json) override{
-        return json.contains("status") && json.contains("resmsg");
-    }
->>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
+    bool is_api_error(const flatjson::fjson& json) override{return json.contains("message") || json.contains("channels");}
 
     std::pair<int, std::string> info_api_error(const flatjson::fjson& json) override{
-        int ec = json.at("status").to_int();
-        std::string msg = json.at("resmsg").to_string();
-        return std::make_pair(ec, std::move(msg));
+        if(json.contains("channels")) return std::make_pair(0, "ok");
+        std::string msg = json.at("message").to_string();
+        msg.append("[");
+        msg.append(msg);
+        msg.append("]");
+        return std::make_pair(400, std::move(msg));
     }
 
     std::string make_channel(const char* symbol, const char* channel) override{
-        // Bithumb raw streams -> /pub/ws
-        std::string str{"/pub/ws"};
-        return str;
+        return "/";
     }
 
     void control_msg(Websocket& ws) override{
-        ws.ws_send_msg(boost::beast::websocket::ping_data{});
+        ws.ws_send_pong({});
     }
 
-<<<<<<< HEAD
-    static std::string make_send_msg(const char* type, const std::vector<std::string>& symbols, const std::vector<std::string>& times){
-        std::string msg{"{\"type\":\""};
-        msg.append(type);
-        msg.append("\",\"symbols\":[");
-        for(const std::string& symbol : symbols){
-            std::string temp = "\""+symbol+"\",";
-            msg.append(temp);
-        }
-        msg.pop_back();
-        msg.append("],\"tickTypes\":[");
-        for(const std::string& time: times){
-            std::string temp = "\""+time+"\",";
-            msg.append(temp);
-        }
-        msg.pop_back();
-        msg.append("]");
-        msg.append("}");
-        return msg;
-    }
-
-    ExchangeManagement::handler bithumb_on_tick(const time_frame period, on_bithumb_cb cb){
-        return ws_pimpl->start_websocket({}, {}, period, std::move(cb));
-=======
     std::string make_signed() override{
         std::string _signed;
 
         return _signed;
     }
 
-
     using send_value_type = boost::variant<std::vector<std::string>, const char*>;
     using send_type = std::pair<const char*, send_value_type>;
     using init_send_Type = std::initializer_list<send_type>;
-
     static std::string make_send_msg(const init_send_Type& map){
         // --> variant value 확인
         auto is_valid_params_value = [](const send_value_type& value) -> bool{
@@ -183,8 +131,8 @@ public:
             assert(!"cant convert str");
             return "";
         };
-        std::string send_msg = "{";
 
+        std::string send_msg = "{";
         for(const auto& pair : map){
             if(is_valid_params_value(pair.second)){
                 if(send_msg.size() > 1) send_msg.push_back(',');
@@ -199,36 +147,36 @@ public:
         return send_msg;
     }
 
-    ExchangeManagement::handler bithumb_on_tick(const char* pair,
-                                                const bithumb::time_frame period,
+    ExchangeManagement::handler coinbase_on_tick(const char* pair,
+                                                const coinbase::time_frame period,
                                                 std::size_t bar_len,
                                                 std::string send_msg,
-                                                on_bithumb_cb ws_cb,
-                                                candlestick_cb c_cb = {}){
+                                                on_coinbase_cb on_cb,
+                                                candles_cb k_cb = {}){
 
-        const char* interval = bithumb::time_frame_to_string(period);
+        const char* granularity = coinbase::time_frame_to_string(period);
 
-        std::string target = "/public/candlestick/";
+        const rest_impl::init_list_Type map = {
+                {"granularity", granularity},
+        };
+
+        std::string target = "/products/";
         target.append(pair);
-        target.append("/");
-        target.append(interval);
+        target.append("/candles");
 
-        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, {}, std::move(c_cb));
-
-        std::size_t t_period = static_cast<std::underlying_type<bithumb::time_frame>::type>(period);
+        auto res = rest_pimpl->post(false, target.c_str(), boost::beast::http::verb::get, map, std::move(k_cb));
+        std::size_t t_period = static_cast<std::underlying_type<coinbase::time_frame>::type>(period);
         unix_time_data time_data(t_period);
 
         if(!res){
-            std::cerr << "bithumb rest error: " << res.err_msg << std::endl;
+            std::cerr << "coinbase rest error: " << res.err_msg << std::endl;
         }else{
             //std::cout << res.v << std::endl;
         }
         ws_pimpl->init_tick_data(bar_len);
-        return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(ws_cb), res);
->>>>>>> 5651c9286bb7a0bfecb1bfb9bb6bf3fa3a6820a5
+        return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(on_cb), res);
     }
 
 private:
 };
-
-#endif //CRYPTO_EXCHANGE_API_BITHUMBAPI_H
+#endif //CRYPTO_EXCHANGE_API_COINBASEAPI_H
