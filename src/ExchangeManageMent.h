@@ -705,7 +705,7 @@ public:
                 }else{
                     std::string read_buffer = std::move(r.v);
 
-                    const flatjson::fjson json{read_buffer.c_str(), read_buffer.length()};
+                    const flatjson::fjson json(read_buffer.c_str(), read_buffer.length());
                     if(json.error() != flatjson::FJ_EC_OK){
                         // ---> json error
                         res.ec = json.error();

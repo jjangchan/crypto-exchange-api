@@ -45,7 +45,7 @@ int main() {
                                 //std::cout << "bar size --> " << v_size << std::endl;
                                 return true;
                             });
-**/
+
 
     /**
     std::string send_msg = UpbitAPI::make_send_msg({
@@ -85,7 +85,6 @@ int main() {
         return true;
     });
     **/
-
 
     std::string send_msg =  BithumbAPI::make_send_msg({
             {"type", "ticker"},
@@ -151,7 +150,9 @@ int main() {
         std::size_t v_size = opens.size();
         return true;
     });
+    **/
 
+    /**
     boost::asio::steady_timer timer{service, std::chrono::steady_clock::now()+ std::chrono::seconds(5)};
     timer.async_wait([&coinbase_api, handler](const auto &ec){
         std::cout << "wake up......" << std::endl;

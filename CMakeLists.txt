@@ -68,6 +68,7 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 set(Boost_NO_BOOST_CMAKE         ON)
+
 find_package(Boost
         1.79.0
         COMPONENTS
@@ -82,6 +83,7 @@ find_package(Boost
         chrono
         atomic
         REQUIRED)
+
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     set(Boost_LIB
