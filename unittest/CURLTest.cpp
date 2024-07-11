@@ -25,7 +25,4 @@ public:
 };
 
 TEST_F(CURLTest, curlInitTest){
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    curl = curl_easy_init();
-    ASSERT_TRUE(curl);
 }

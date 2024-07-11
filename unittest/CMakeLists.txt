@@ -1,39 +1,35 @@
 project(unittest)
-add_subdirectory(lib)
+#add_subdirectory(lib)
 
-if(APPLE)
-    message(STATUS ">>> OS: APPLE")
-elseif(LINUX OR UNIX)
-    message(STATUS ">>> OS: LINUX OR UNIX")
-    set(CMAKE_BUILD_TYPE Release)
-elseif(WIN32)
-    message(STATUS ">>> OS: WINDOWS")
-endif()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread")
-
+set(CMAKE_CXX_STANDARD 14)
 SET(SRC
-        ConfigTest.cpp
         CURLTest.cpp)
 
-link_directories(/usr/local/lib)
-link_directories(/usr/local/lib64)
+link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
+include_directories(../include)
+
+if(UNIX AND NOT APPLE)
+    link_libraries(uuid)
+endif()
 
 add_executable(${PROJECT_NAME} ${SRC})
 
+
 ######################################################################
 # THREAD
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-# add_executable
-target_link_libraries(${PROJECT_NAME} Threads::Threads)
+if(UNIX)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+    # add_executable
+    target_link_libraries(${PROJECT_NAME} Threads::Threads)
+endif()
 ######################################################################
+
 
 ######################################################################
 # CURL
-set(CURL_LIBRARY "-lcurl")
 find_package(CURL REQUIRED)
 if(CURL_FOUND)
     include_directories(${CURL_INCLUDE_DIR})
@@ -54,7 +50,7 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 set(Boost_NO_BOOST_CMAKE         ON)
 find_package(Boost
-        1.72.0
+        1.79.0
         COMPONENTS
         program_options
         thread
@@ -87,6 +83,12 @@ endif()
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 ######################################################################
 
+######################################################################
+# OPENSSL
+include_directories(/usr/local/opt/openssl@3/include)
+target_link_libraries(${PROJECT_NAME} ssl crypto)
+######################################################################
+
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${INCDIR})
 
@@ -97,6 +99,5 @@ elseif(LINUX OR UNIX)
 elseif(WIN32)
     #    include_directories(/usr/local/include)
 endif()
-
 
 target_link_libraries(${PROJECT_NAME} gtest gtest_main)

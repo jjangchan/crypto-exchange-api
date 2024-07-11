@@ -29,7 +29,7 @@ SET(SRC
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
 include_directories(include)
 
-if(LINUX)
+if(UNIX AND NOT APPLE)
     link_libraries(uuid)
 endif()
 
@@ -38,11 +38,13 @@ add_executable(crypto_exchange_api ${SRC})
 
 ######################################################################
 # THREAD
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-# add_executable
-target_link_libraries(${PROJECT_NAME} Threads::Threads)
+if(UNIX)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+    # add_executable
+    target_link_libraries(${PROJECT_NAME} Threads::Threads)
+endif()
 ######################################################################
 
 
@@ -105,13 +107,20 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 ######################################################################
 
 
-include_directories(/usr/local/include)
-
 ######################################################################
 # OPENSSL
 include_directories(/usr/local/opt/openssl@3/include)
 target_link_libraries(${PROJECT_NAME} ssl crypto)
 ######################################################################
+
+if(APPLE)
+    include_directories(/usr/local/include)
+elseif(LINUX OR UNIX)
+    include_directories(/usr/local/include)
+elseif(WIN32)
+    #    include_directories(/usr/local/include)
+endif()
+
 
 add_subdirectory(unittest)
 
