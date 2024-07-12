@@ -1,10 +1,13 @@
+cmake_minimum_required(VERSION 3.22)
 project(unittest)
-#add_subdirectory(lib)
 
 
 set(CMAKE_CXX_STANDARD 14)
 SET(SRC
-        CURLTest.cpp)
+        BinanceTest.cpp
+        BithumbTest.cpp
+        CoinBaseTest.cpp
+        UpbitTest.cpp)
 
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
 include_directories(../include)

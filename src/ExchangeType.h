@@ -16,7 +16,7 @@
 
 /**********************************************************************************************************************/
 /*                                             uuid                                                                   */
-std::string get_uuid(){
+inline std::string get_uuid(){
     char uuid[38];
     uuid_t uuidGenerated;
     uuid_generate_random(uuidGenerated);
@@ -154,6 +154,7 @@ struct unix_time_data{
         week_start_unix = current_unix-(week * 60 * 60 * 24);
         week_end_unix = week_start_unix + (7 * 60 * 60 * 24);
 
+        /**
         std::cout << "start year -> " << year_start_unix << std::endl;
         std::cout << "end year -> " << year_end_unix << std::endl;
 
@@ -162,6 +163,7 @@ struct unix_time_data{
 
         std::cout << "start week -> " << week_start_unix << std::endl;
         std::cout << "end week -> " << week_end_unix << std::endl;
+        **/
     }
 
     unix_time_data(){}
@@ -387,13 +389,12 @@ namespace binance{
                 volumes.push_back(v);
 
                 len = open_times.size();
-                std::size_t b_len = len >= bars_len ? len-2 : len-1;
                 std::cout <<
-                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
-                          "o -- > " << opens[b_len] << "\n" <<
-                          "h -- > " << highs[b_len] << "\n" <<
-                          "l -- > " << lows[b_len] << "\n" <<
-                          "c -- > " << closes[b_len] << "\n" <<
+                          "t -- > " << (open_times[len-2]/1000) << "\n" <<
+                          "o -- > " << opens[len-2] << "\n" <<
+                          "h -- > " << highs[len-2] << "\n" <<
+                          "l -- > " << lows[len-2] << "\n" <<
+                          "c -- > " << closes[len-2] << "\n" <<
                           "==============================================================" << std::endl;
                 return;
             }
@@ -407,7 +408,7 @@ namespace binance{
         friend std::ostream& operator<<(std::ostream &os, const kline_t &o);
     };
 
-    std::ostream &operator<<(std::ostream &os, const kline_t &o) {
+    inline std::ostream &operator<<(std::ostream &os, const kline_t &o) {
         os <<
         "E -- > " << o.E << "\n" <<
         "o -- > " << o.o << "\n" <<
@@ -486,7 +487,7 @@ namespace binance{
         friend std::ostream &operator<<(std::ostream &os, const klines_t &s);
     };
 
-    std::ostream& operator<<(std::ostream &os, const klines_t &s){
+    inline std::ostream& operator<<(std::ostream &os, const klines_t &s){
         os << "bar size -> " << s.klines.size() << "\n";
         for(int i = 0; i < s.klines.size(); ++i){
             os <<
@@ -675,14 +676,12 @@ namespace bithumb {
                 volumes.push_back(volume);
 
                 len = open_times.size();
-                std::size_t b_len = len >= bars_len ? len-2 : len-1;
                 std::cout <<
-                    "T -- > " << unix_time << "\n" <<
-                    "t -- > " << (open_times[b_len]/1000) << "\n" <<
-                    "o -- > " << opens[b_len] << "\n" <<
-                    "h -- > " << highs[b_len] << "\n" <<
-                    "l -- > " << lows[b_len] << "\n" <<
-                    "c -- > " << closes[b_len] << "\n" <<
+                    "t -- > " << (open_times[len-2]/1000) << "\n" <<
+                    "o -- > " << opens[len-2] << "\n" <<
+                    "h -- > " << highs[len-2] << "\n" <<
+                    "l -- > " << lows[len-2] << "\n" <<
+                    "c -- > " << closes[len-2] << "\n" <<
                     "==============================================================" << std::endl;
                 return;
             }
@@ -701,7 +700,7 @@ namespace bithumb {
         friend std::ostream &operator<<(std::ostream &os, const ticker &o);
     };
 
-    std::ostream &operator<<(std::ostream &os, const ticker &o) {
+    inline std::ostream &operator<<(std::ostream &os, const ticker &o) {
         os <<
            "o -- > " << o.openPrice << "\n" <<
            "h -- > " << o.highPrice << "\n" <<
@@ -769,7 +768,7 @@ namespace bithumb {
         friend std::ostream &operator<<(std::ostream &os, const candlesticks_t& s);
     };
 
-    std::ostream& operator<<(std::ostream &os, const candlesticks_t& s){
+    inline std::ostream& operator<<(std::ostream &os, const candlesticks_t& s){
         os << "bar size -> " << s.candlesticks.size() << "\n";
         for(int i = 0; i < s.candlesticks.size(); ++i){
             os <<
@@ -953,15 +952,13 @@ namespace upbit{
                 volumes.push_back(trade_volume);
 
                 len = open_times.size();
-                std::size_t b_len = len >= bars_len ? len-2 : len-1;
                 std::cout <<
-                          "T -- > " << unix_time << "\n" <<
-                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
-                          "o -- > " << opens[b_len] << "\n" <<
-                          "h -- > " << highs[b_len] << "\n" <<
-                          "l -- > " << lows[b_len] << "\n" <<
-                          "c -- > " << closes[b_len] << "\n" <<
-                          "v -- > " << volumes[b_len] << "\n" <<
+                          "t -- > " << (open_times[len-2]/1000) << "\n" <<
+                          "o -- > " << opens[len-2] << "\n" <<
+                          "h -- > " << highs[len-2] << "\n" <<
+                          "l -- > " << lows[len-2] << "\n" <<
+                          "c -- > " << closes[len-2] << "\n" <<
+                          "v -- > " << volumes[len-2] << "\n" <<
                           "==============================================================" << std::endl;
                 return;
             }
@@ -1047,7 +1044,7 @@ namespace upbit{
 
     };
 
-    std::ostream& operator<<(std::ostream &os, const candles_t& s){
+    inline std::ostream& operator<<(std::ostream &os, const candles_t& s){
         os << "bar size -> " << s.candles.size() << "\n";
         for(int i = 0; i < s.candles.size(); ++i){
             os <<
@@ -1193,14 +1190,13 @@ namespace coinbase{
                 closes.push_back(price);
                 volumes.push_back(last_size);
 
-                std::size_t b_len = len >= bars_len ? len-2 : len-1;
+                len = open_times.size();
                 std::cout <<
-                          "T -- > " << unix_time << "\n" <<
-                          "t -- > " << (open_times[b_len]/1000) << "\n" <<
-                          "o -- > " << opens[b_len] << "\n" <<
-                          "h -- > " << highs[b_len] << "\n" <<
-                          "l -- > " << lows[b_len] << "\n" <<
-                          "c -- > " << closes[b_len] << "\n" <<
+                          "t -- > " << (open_times[len-2]/1000) << "\n" <<
+                          "o -- > " << opens[len-2] << "\n" <<
+                          "h -- > " << highs[len-2] << "\n" <<
+                          "l -- > " << lows[len-2] << "\n" <<
+                          "c -- > " << closes[len-2] << "\n" <<
                           "==============================================================" << std::endl;
                 return;
             }
@@ -1277,7 +1273,7 @@ namespace coinbase{
 
     };
 
-    std::ostream& operator<<(std::ostream &os, const candles_t& s){
+    inline std::ostream& operator<<(std::ostream &os, const candles_t& s){
         os << "bar size -> " << s.candles.size() << "\n";
         for(int i = 0; i < s.candles.size(); ++i){
             os <<

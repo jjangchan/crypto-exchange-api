@@ -72,7 +72,7 @@ enum class binance_error : int{
     ,NO_TRADING_WINDOW = -2016
 };
 
-const char* binance_error_to_string(binance_error e){
+inline const char* binance_error_to_string(binance_error e){
     switch ( e ) {
         case binance_error::OK : return "OK";
         case binance_error::UNKNOWN : return "UNKNOWN";
@@ -146,7 +146,7 @@ enum class upbit_error : int{
 
 };
 
-const char* upbit_error_to_string(const upbit_error e){
+inline const char* upbit_error_to_string(const upbit_error e){
     switch (e) {
         case upbit_error::OK : return "OK";
         case upbit_error::CREATE_ASK_ERROR : return "CREATE_ASK_ERROR";
@@ -282,7 +282,7 @@ enum class bithumb_error : int{
     NOT_GET_PRICE = 3000
 };
 
-const char* bithumb_error_to_string(bithumb_error e){
+inline const char* bithumb_error_to_string(bithumb_error e){
     switch ( e ) {
         case bithumb_error::OK : return "OK";
         case bithumb_error::BAD_REQUEST : return "BAD_REQUEST";
@@ -309,7 +309,7 @@ enum class coinbase_error : int{
     CHAIN_DISCONNECTED = 4901,
 };
 
-const char* coinbase_error_to_string(coinbase_error e){
+inline const char* coinbase_error_to_string(coinbase_error e){
     switch ( e ) {
         case coinbase_error::OK : return "OK";
         case coinbase_error::USER_REJECTED_REQUEST : return "USER_REJECTED_REQUEST";

@@ -62,11 +62,11 @@ public:
 
     ~BinanceAPI(){}
     BinanceAPI(BinanceAPI&& b_api) noexcept = default;
-    BinanceAPI(const BinanceAPI& b_api) = default;
+    BinanceAPI& operator=(BinanceAPI&& b_api) noexcept = default;
 
     // delete
     BinanceAPI& operator=(const BinanceAPI& b_api) = delete;
-    BinanceAPI& operator=(BinanceAPI&& b_api) noexcept = delete;
+    BinanceAPI(const BinanceAPI& b_api) = delete;
 
 public:
 

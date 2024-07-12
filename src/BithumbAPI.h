@@ -40,14 +40,14 @@ public:
      * @param rest_client_user_agent
      */
     BithumbAPI(boost::asio::io_context& _context,
-               std::string ws_host,
-               std::string ws_port,
-               std::string rest_host,
-               std::string rest_port,
-               std::string rest_pk,
-               std::string rest_sk,
-               std::size_t rest_timeout,
-               std::string rest_client_user_agent)
+                std::string ws_host,
+                std::string ws_port,
+                std::string rest_host,
+                std::string rest_port,
+                std::string rest_pk,
+                std::string rest_sk,
+                std::size_t rest_timeout,
+                std::string rest_client_user_agent)
             : ExchangeManagement(_context,
                                  std::move(ws_host),
                                  std::move(ws_port),
@@ -61,11 +61,11 @@ public:
 
     ~BithumbAPI(){}
     BithumbAPI(BithumbAPI&& b_api) noexcept = default;
-    BithumbAPI(const BithumbAPI& b_api) = default;
+    BithumbAPI& operator=(BithumbAPI&& b_api) noexcept = default;
 
     // delete
     BithumbAPI& operator=(const BithumbAPI& b_api) = delete;
-    BithumbAPI& operator=(BithumbAPI&& b_api) noexcept = delete;
+    BithumbAPI(const BithumbAPI& b_api) = delete;
 
 public:
 

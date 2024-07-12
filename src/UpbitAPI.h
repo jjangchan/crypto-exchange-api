@@ -63,11 +63,11 @@ public:
 
     ~UpbitAPI(){}
     UpbitAPI(UpbitAPI&& b_api) noexcept = default;
-    UpbitAPI(const UpbitAPI& b_api) = default;
+    UpbitAPI& operator=(UpbitAPI&& b_api) noexcept = default;
 
     // delete
     UpbitAPI& operator=(const UpbitAPI& b_api) = delete;
-    UpbitAPI& operator=(UpbitAPI&& b_api) noexcept = delete;
+    UpbitAPI(const UpbitAPI& b_api) = delete;
 
 public:
 
@@ -179,7 +179,7 @@ public:
         if(!res){
             std::cerr << "upbit rest error: " << res.err_msg << std::endl;
         }else{
-            std::cout << res.v << std::endl;
+            //std::cout << res.v << std::endl;
         }
         ws_pimpl->init_tick_data(bar_len);
         return ws_pimpl->start_websocket({}, {}, std::move(send_msg), time_data, std::move(on_cb), res);

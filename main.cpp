@@ -45,9 +45,9 @@ int main() {
                                 //std::cout << "bar size --> " << v_size << std::endl;
                                 return true;
                             });
+    **/
 
 
-    /**
     std::string send_msg = UpbitAPI::make_send_msg({
                                                            {"ticket", get_uuid().c_str()},
                                                            {"type", "ticker"},
@@ -84,22 +84,22 @@ int main() {
         //std::cout << "bar size --> " << v_size << std::endl;
         return true;
     });
-    **/
 
+    /**
     std::string send_msg =  BithumbAPI::make_send_msg({
             {"type", "ticker"},
             {"symbols", std::vector<std::string>{"BTC_KRW"}},
             {"tickTypes", std::vector<std::string>{"30M"}}
     });
     BithumbAPI bithumb_api(service,
-                           "pubwss.bithumb.com",
-                           "443",
-                           "api.bithumb.com",
-                           "443",
-                           "",
-                           "",
-                           10000,
-                           "");
+                            "pubwss.bithumb.com",
+                            "443",
+                            "api.bithumb.com",
+                            "443",
+                            "",
+                            "",
+                            10000,
+                            "");
     auto handler = bithumb_api.bithumb_on_tick("BTC_KRW", bithumb::time_frame::_1m, 1024, send_msg,
                                                [](const char* file_name,
                                                   int ec,
@@ -121,6 +121,8 @@ int main() {
         //std::cout << msg << std::endl;
         return true;
     });
+**/
+
 
     /**
     BinanceAPI binance_api(service,
@@ -150,13 +152,10 @@ int main() {
         std::size_t v_size = opens.size();
         return true;
     });
-    **/
-
-    /**
     boost::asio::steady_timer timer{service, std::chrono::steady_clock::now()+ std::chrono::seconds(5)};
-    timer.async_wait([&coinbase_api, handler](const auto &ec){
+    timer.async_wait([&bithumb_api, handler](const auto &ec){
         std::cout << "wake up......" << std::endl;
-        coinbase_api.ws_all_async_close(handler);
+        bithumb_api.ws_all_async_close(handler);
     });
     **/
     service.run();

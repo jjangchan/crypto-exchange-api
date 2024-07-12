@@ -449,14 +449,15 @@ public:
         // 거래소 rest api로 가져온 bar data insert
         if(res){
             res.v.init_tick_data(bars_len, open_times, opens, highs, lows, closes, volumes);
-            for(std::size_t i = 0; i < open_times.size(); i++){
-                std::cout << "open_times ->" << open_times[i] << std::endl;
-                std::cout << "open ->" << opens[i] << std::endl;
-                std::cout << "high->" << highs[i] << std::endl;
-                std::cout << "low ->" << lows[i] << std::endl;
-                std::cout << "close ->" << closes[i] << std::endl;
-                std::cout << "volume ->" << volumes[i] << std::endl;
-                std::cout <<" ===================================================" << std::endl;
+            std::size_t i = open_times.size()-10 < 0 ? 0 : open_times.size()-10;
+            for(; i < open_times.size(); i++){
+                std::cout << "open_times --> " << open_times[i]/1000 << std::endl;
+                std::cout << "open --> " << opens[i] << std::endl;
+                std::cout << "high --> " << highs[i] << std::endl;
+                std::cout << "low --> " << lows[i] << std::endl;
+                std::cout << "close --> " << closes[i] << std::endl;
+                std::cout << "volume --> " << volumes[i] << std::endl;
+                std::cout << "==============================================================" << std::endl;
             }
         }
 
@@ -676,7 +677,7 @@ public:
             }
         }
 
-        std::cout << "params -> " << params << std::endl;
+        //std::cout << "params -> " << params << std::endl;
 
         if(_signed){
             assert(!pk.empty() && !sk.empty());
@@ -692,7 +693,7 @@ public:
             params.clear();
         }
 
-        std::cout << "post url -> " << post_url << std::endl;
+        //std::cout << "post url -> " << post_url << std::endl;
         ExchangeManagement::rest_result<R> res{};
 
         if(!cb){ // --> sync post
@@ -828,19 +829,19 @@ private:
     }
 };
 
-void ExchangeManagement::ws_close(const handler &h) {
+inline void ExchangeManagement::ws_close(const handler &h) {
     return ws_pimpl->ws_stop_channel(h);
 }
 
-void ExchangeManagement::ws_async_close(const handler &h) {
+inline void ExchangeManagement::ws_async_close(const handler &h) {
     return ws_pimpl->ws_async_stop_channel(h);
 }
 
-void ExchangeManagement::ws_all_close(const handler &h) {
+inline void ExchangeManagement::ws_all_close(const handler &h) {
     return ws_pimpl->ws_all_stop_channel(h);
 }
 
-void ExchangeManagement::ws_all_async_close(const handler &h) {
+inline void ExchangeManagement::ws_all_async_close(const handler &h) {
     return ws_pimpl->ws_all_async_stop_channel(h);
 }
 
