@@ -30,8 +30,8 @@ docker run -it --name {cotainer_name} crypto-api
 |-- src
 |-- unittest
 |-- build
-|	|-- unittest            
-| |-- crypto_exchange_api # execute file
+|	    |-- unittest            
+|     |-- crypto_exchange_api # execute file
 |
 |-- README.md
 ```
