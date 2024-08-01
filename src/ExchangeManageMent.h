@@ -81,7 +81,7 @@ public:
         is_stop_ws{}
     {}
     virtual ~Websocket(){
-        std::cout << "websocket ... delete ..." << std::endl;
+        std::cout << ">>>>>>>>>>>>>>>>>> websocket deconstruct" << std::endl;
     }
 
 public:
@@ -110,7 +110,7 @@ public:
         if(w_socket.next_layer().next_layer().is_open()){
             w_socket.async_close(
                     boost::beast::websocket::close_code::normal,
-                    [ws = std::move(ws)](const boost::system::error_code &){std::cout << ".......websocket close........." << std::endl;}
+                    [ws = std::move(ws)](const boost::system::error_code &){std::cout << ">>>>>>>>>>>>>>> websocket close" << std::endl;}
             );
         }
     }
@@ -433,7 +433,7 @@ public:
         // call back 함수 argument type 정보를 가져온다.
         using cb_args_type = typename boost::callable_traits::args<F>::type;
 
-        // call back 함수 4번째 argument type을 가져온다.
+        // call back 함수 4번째 argument type을 가져온다(파싱 해야 할 data object).
         using message_type = typename std::tuple_element<3, cb_args_type>::type;
 
         // shared_ptr<Websocket> deleter 구현
