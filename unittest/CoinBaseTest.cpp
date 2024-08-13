@@ -14,11 +14,10 @@ protected:
 
 public:
     virtual void SetUp(){
-        std::cout << "SET UP" << std::endl;
-
+        std::cout << "SET UP COINBASE ======================================================" << std::endl;
     }
     virtual void TearDown(){
-        std::cout << "TEAR DOWN" << std::endl;
+        std::cout << "TEAR DOWN COINBASE ======================================================" << std::endl;
     }
 };
 

@@ -81,7 +81,7 @@ public:
         is_stop_ws{}
     {}
     virtual ~Websocket(){
-        std::cout << ">>>>>>>>>>>>>>>>>> websocket deconstruct" << std::endl;
+        //std::cout << ">>>>>>>>>>>>>>>>>> websocket deconstruct" << std::endl;
     }
 
 public:
@@ -110,7 +110,7 @@ public:
         if(w_socket.next_layer().next_layer().is_open()){
             w_socket.async_close(
                     boost::beast::websocket::close_code::normal,
-                    [ws = std::move(ws)](const boost::system::error_code &){std::cout << ">>>>>>>>>>>>>>> websocket close" << std::endl;}
+                    [ws = std::move(ws)](const boost::system::error_code &){/**std::cout << ">>>>>>>>>>>>>>> websocket close" << std::endl;**/}
             );
         }
     }
@@ -783,16 +783,18 @@ private:
             return res;
         }
 
-        // ---> request format setting
+        // ---> request start line setting
         boost::beast::http::request<boost::beast::http::string_body> req;
         req.target(post_url);
         req.version(11); // version 1.1
         req.method(action);
         if(action != boost::beast::http::verb::get){
+            // ---> request body setting
             req.body() = std::move(params);
             req.set(boost::beast::http::field::content_length, std::to_string(req.body().length()));
         }
 
+        // ---> request header setting
         req.insert("X-MBX-APIKEY", pk);
         req.set(boost::beast::http::field::host, host);
         req.set(boost::beast::http::field::user_agent, client_user_agent);

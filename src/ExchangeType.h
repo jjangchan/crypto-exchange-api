@@ -113,6 +113,12 @@ constexpr std::uint32_t fnv1a(const charPtr (&str)[N]){
 /**********************************************************************************************************************/
 /*                                             timestamp                                                              */
 
+inline std::uint64_t get_current_ms_epoch(){
+    return static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+            ).count());
+}
+
 struct unix_time_data{
     std::size_t year_start_unix;
     std::size_t year_end_unix;

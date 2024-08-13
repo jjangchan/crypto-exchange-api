@@ -158,6 +158,7 @@ public:
 
         const rest_impl::init_list_Type map = {
                 {"granularity", granularity},
+                {"end", get_current_ms_epoch()}
         };
 
         std::string target = "/products/";
