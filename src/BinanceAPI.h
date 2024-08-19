@@ -6,6 +6,7 @@
 #define CRYPTO_EXCHANGE_API_BINANCE_H
 
 #include "ExchangeManageMent.h"
+#include <openssl/hmac.h>
 
 
 class BinanceAPI : public ExchangeManagement{
@@ -92,11 +93,44 @@ public:
         ws.ws_send_pong({});
     }
 
-    std::string make_signed() override{
-        std::string _signed;
+    std::string make_signed(std::string params) override{
+        params.append("timestamp=");
+        params.append(std::to_string(get_current_ms_epoch()));
+        params.append("&recvWindow=");
+        params.append(rest_pimpl->get_str_timeout());
 
-        return _signed;
+        std::string sk = rest_pimpl->get_sk();
+        std::string sign = hmac_sha256(sk.c_str(), sk.length(), params.c_str(), params.length());
+        params.append("&signature=");
+        params.append(sign);
+        return params;
     }
+
+    rest_result<crypto_order_send> order_send(const crypto_send_info& info) override{
+        auto b_info = static_cast<const binance::send_info*>(info.get_send_info());
+
+        const char* side = enum_side_to_str(b_info->side);
+        const char* type = enum_type_to_str(b_info->type);
+        const char* time = (b_info->type == binance::enum_type::market) ? nullptr : enum_time_to_str(b_info->time);
+
+        const rest_impl::init_list_Type map = {
+                 {"symbol", b_info->symbol}
+                ,{"side", side}
+                ,{"type", type}
+                ,{"timeInForce", time}
+                ,{"quantity", b_info->amount}
+                ,{"price", b_info->price}
+                ,{"newClientOrderId", b_info->client_order_id}
+                ,{"strategyId", b_info->strategyId}
+                ,{"strategyType", b_info->strategyType}
+                ,{"stopPrice", b_info->stop_price}
+                ,{"icebergQty", b_info->iceberg_amount}
+                ,{"newOrderRespType", "FULL"}
+
+        };
+        return rest_pimpl->post(true, "/api/v3/order", boost::beast::http::verb::post, map, b_info->cb);
+    }
+
 
     ExchangeManagement::handler binance_on_tick(const char* pair,
                                                 const binance::time_frame period,
@@ -127,6 +161,37 @@ public:
     }
 
 private:
+    std::string hmac_sha256(const char *key, std::size_t klen, const char *data, std::size_t dlen) {
+        std::uint8_t digest[EVP_MAX_MD_SIZE];
+        std::uint32_t dilen{};
+
+        auto p = ::HMAC(
+                ::EVP_sha256()
+                ,key
+                ,klen
+                ,(std::uint8_t *)data
+                ,dlen
+                ,digest
+                ,&dilen
+        );
+        assert(p);
+
+        return b2a_hex(digest, dilen);
+    }
+
+    std::string b2a_hex(const std::uint8_t *p, std::size_t n) {
+        static const char hex[] = "0123456789abcdef";
+        std::string res;
+        res.reserve(n * 2);
+
+        for ( auto end = p + n; p != end; ++p ) {
+            const std::uint8_t v = (*p);
+            res += hex[(v >> 4) & 0x0F];
+            res += hex[v & 0x0F];
+        }
+
+        return res;
+    }
 };
 
 

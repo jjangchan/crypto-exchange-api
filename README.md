@@ -30,7 +30,8 @@ docker run -it --name {cotainer_name} crypto-api
 |-- src
 |-- unittest
 |-- build
-|	    |-- unittest            # exexute file
+|	    |-- unittest
+|     |     |-- unittest# exexute file
 |     |-- crypto_exchange_api # execute file
 |
 |-- README.md
@@ -43,8 +44,7 @@ docker run -it --name {cotainer_name} crypto-api
 4개의 암호화폐 거래소(바이낸스, 빗썸, 코인베이스, 업비트)에 1분봉 캔들 데이터를 받아오고, 1분봉 기준으로 1분동안 데이터 신호를 받아오는 테스트
 
 ```	shell
-cd /source/build
-cd unittest
+cd /source/build/unittest
 ./unittest
 ```
 

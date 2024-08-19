@@ -93,10 +93,12 @@ public:
         ws.ws_send_pong({});
     }
 
-    std::string make_signed() override{
-        std::string _signed;
+    std::string make_signed(std::string params) override{
+        return params;
+    }
 
-        return _signed;
+    rest_result<crypto_order_send> order_send(const crypto_send_info& info) override{
+
     }
 
     using send_value_type = boost::variant<std::vector<std::string>, const char*>;

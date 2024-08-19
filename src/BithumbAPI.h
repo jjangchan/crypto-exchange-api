@@ -89,10 +89,12 @@ public:
         ws.ws_write_msg(std::string{});
     }
 
-    std::string make_signed() override{
-        std::string _signed;
+    std::string make_signed(std::string params) override{
+        return params;
+    }
 
-        return _signed;
+    rest_result<crypto_order_send> order_send(const crypto_send_info& info) override{
+
     }
 
 

@@ -141,18 +141,41 @@ void bithumb_example(boost::asio::io_context& service, const std::size_t life_se
 
 }
 
-void binance_example(boost::asio::io_context& service, const std::size_t life_sec_time){
+void binance_example(boost::asio::io_context& service,
+                     const std::size_t life_sec_time,
+                     std::string pk,
+                     std::string sk){
     service.restart();
+
+    std::cout << "pk -> " << pk << std::endl;
+    std::cout << "sk -> " << sk << std::endl;
+
     BinanceAPI binance_api(service,
                            "stream.binance.com",
                            "9443",
-                           "api.binance.com",
+                           //"api.binance.com",
+                           "testnet.binance.vision",
                            "443",
-                           "",
-                           "",
+                           std::move(pk),
+                           std::move(sk),
                            10000,
                            "");
-    auto handler = binance_api.binance_on_tick("BTCUSDT", time_frame::_1m, 1024, "", [](const char* file_name,
+
+    binance::send_info info("LINKUSDT",
+                            binance::enum_side::buy,
+                            binance::enum_type::market,
+                            binance::enum_time::GTC,
+                            "1",
+                            {}, {}, {}, {}, {}, {});
+
+    auto re = binance_api.order_send(info);
+    if ( !re ) {
+        std::cerr << "get error: " << re.err_msg << std::endl;
+        return;
+    }
+
+    return;
+    auto handler = binance_api.binance_on_tick("BTCUSDT", binance::time_frame::_1m, 1024, "", [](const char* file_name,
                                                                                         int ec,
                                                                                         std::string err_msg,
                                                                                         auto msg,
@@ -178,12 +201,14 @@ void binance_example(boost::asio::io_context& service, const std::size_t life_se
     service.run();
 }
 
-
-int main() {
+int main(int argc, char** argv) {
+    assert(argc == 3);
+    std::string pk = argv[1];
+    std::string sk = argv[2];
     boost::asio::io_context service;
-    //binance_example(service, 5);
+    binance_example(service, 5, std::move(pk), std::move(sk));
     //upbit_example(service, 5);
     //bithumb_example(service, 5);
-    coinbase_example(service, 60);
+    //coinbase_example(service, 60);
     return 0;
 }

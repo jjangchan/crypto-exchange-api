@@ -240,8 +240,8 @@ struct unix_time_data{
         return timegm( timeinfo );
     }
 };
+struct crypto_order_send;
 
-/**********************************************************************************************************************/
 namespace binance{
     enum class time_frame : int{
         // mins
@@ -507,8 +507,168 @@ namespace binance{
         }
         return os;
     }
-}
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#new-order-trade
+    struct new_order{
+        std::string symbol;
+        std::size_t orderId;
+        std::string clientOrderId;
+        std::size_t transactTime;
+        double_type price;
+        double_type origQty;
+        double_type executedQty;
+        double_type cummulativeQuoteQty;
+        std::string status;
+        std::string timeInForce;
+        std::string type;
+        std::string side;
+        std::size_t strategyId;
+        std::size_t strategyType;
 
+        struct fill{
+            double_type price;
+            double_type qty;
+            double_type commission;
+            std::string commissionAsset;
+        };
+        std::vector<fill> fills;
+
+        static new_order construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+
+            new_order res{};
+            __JSON_PARSE(res, symbol, json);
+            __JSON_PARSE(res, orderId, json);
+            __JSON_PARSE(res, clientOrderId, json);
+            __JSON_PARSE(res, transactTime, json);
+            __JSON_PARSE(res, price, json);
+            __JSON_PARSE(res, origQty, json);
+            __JSON_PARSE(res, executedQty, json);
+            __JSON_PARSE(res, cummulativeQuoteQty, json);
+            __JSON_PARSE(res, status, json);
+            __JSON_PARSE(res, timeInForce, json);
+            __JSON_PARSE(res, type, json);
+            __JSON_PARSE(res, side, json);
+            if(json.contains("strategyId")) __JSON_PARSE(res, strategyId, json);
+            if(json.contains("strategyType")) __JSON_PARSE(res, strategyType, json);
+
+            const auto fills = json.at("fills");
+            for ( auto idx = 0u; idx < fills.size(); ++idx ) {
+                new_order::fill item{};
+                const auto it = fills.at(idx);
+                __JSON_PARSE(item, price, it);
+                __JSON_PARSE(item, qty, it);
+                __JSON_PARSE(item, commission, it);
+                __JSON_PARSE(item, commissionAsset, it);
+                res.fills.push_back(std::move(item));
+            }
+
+            return res;
+        }
+    };
+
+
+/**********************************************************************************************************************/
+
+    enum class enum_side : std::size_t{
+        buy,
+        sell
+    };
+
+    const char* enum_side_to_str(enum_side side){
+        switch (side) {
+            case enum_side::buy : return "BUY";
+            case enum_side::sell : return "SELL";
+        }
+        assert(!"unreachable");
+    }
+
+    enum class enum_type : std::size_t{
+        limit
+        ,market
+        ,stop_loss
+        ,stop_loss_limit
+        ,take_profit
+        ,take_profit_limit
+        ,limit_maker
+    };
+
+    const char* enum_type_to_str(enum_type type) {
+        switch ( type ) {
+            case enum_type::limit: return "LIMIT";
+            case enum_type::market: return "MARKET";
+            case enum_type::stop_loss: return "STOP_LOSS";
+            case enum_type::stop_loss_limit: return "STOP_LOSS_LIMIT";
+            case enum_type::take_profit: return "TAKE_PROFIT";
+            case enum_type::take_profit_limit: return "TAKE_PROFIT_LIMIT";
+            case enum_type::limit_maker: return "LIMIT_MAKER";
+        }
+        assert(!"unreachable");
+        return nullptr;
+    }
+
+    enum class enum_time : std::size_t{
+        GTC
+        ,IOC
+        ,FOK
+
+    };
+
+    const char* enum_time_to_str(enum_time time){
+        switch(time){
+            case enum_time::GTC : return "GTC";
+            case enum_time::IOC : return "IOC";
+            case enum_time::FOK : return "FOK";
+        }
+        assert(!"unreachable");
+    }
+
+    struct send_info{
+        using send_cb = std::function<bool(const char* file_name,
+                                           int ec,
+                                           std::string err_msg,
+                                           crypto_order_send res)>;
+
+        send_cb cb;
+        const char* symbol;
+        const enum_side side;
+        const enum_type type;
+        const enum_time time;
+        const char* amount;
+        const char* price;
+        const char* strategyId;
+        const char* strategyType;
+        const char* client_order_id;
+        const char* stop_price;
+        const char* iceberg_amount;
+
+        send_info(const char* _symbol,
+                  const enum_side _side,
+                  const enum_type _type,
+                  const enum_time _time,
+                  const char* _amount,
+                  const char* _price,
+                  const char* _client_order_id,
+                  const char* _stop_price,
+                  const char* _iceberg_amount,
+                  const char* _strategyId,
+                  const char* _strategyType,
+                  send_cb _cb = {}):
+                  symbol(_symbol),
+                  side(_side),
+                  type(_type),
+                  time(_time),
+                  amount(_amount),
+                  price(_price),
+                  client_order_id(_client_order_id),
+                  stop_price(_stop_price),
+                  iceberg_amount(_iceberg_amount),
+                  strategyId(_strategyId),
+                  strategyType(_strategyType),
+                  cb(std::move(_cb))
+                  {}
+    };
+}
 
 /**********************************************************************************************************************/
 namespace bithumb {
@@ -788,6 +948,23 @@ namespace bithumb {
         }
         return os;
     }
+
+
+/**********************************************************************************************************************/
+// https://apidocs.bithumb.com/reference/%EC%A3%BC%EB%AC%B8%ED%95%98%EA%B8%B0
+    struct orders{
+
+        static orders construct(const flatjson::fjson& json){
+            orders res{};
+
+            return res;
+        }
+    };
+
+    struct send_info{
+
+    };
+
 }
 
 /**********************************************************************************************************************/
@@ -1065,6 +1242,23 @@ namespace upbit{
         return os;
     }
 
+/**********************************************************************************************************************/
+// https://docs.upbit.com/reference/%EC%A3%BC%EB%AC%B8%ED%95%98%EA%B8%B0
+    struct orders{
+
+
+        static orders construct(const flatjson::fjson& json){
+            orders res{};
+
+            return res;
+        }
+
+    };
+
+    struct send_info{
+
+    };
+
 }
 
 /**********************************************************************************************************************/
@@ -1293,7 +1487,101 @@ namespace coinbase{
         }
         return os;
     }
+/**********************************************************************************************************************/
+// https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_postorders
+    struct orders{
+
+        static orders construct(const flatjson::fjson& json){
+            orders res{};
+
+            return res;
+        }
+    };
+
+    struct send_info{
+
+    };
 
 }
+
+/**********************************************************************************************************************/
+/*                                            order function                                                          */
+
+using namespace binance;
+using namespace bithumb;
+using namespace upbit;
+using namespace coinbase;
+
+enum class crypto_type: std::size_t {
+   BINANCE,
+   BITHUMB,
+   COINBASE,
+   UPBIT
+};
+
+struct crypto_order_send
+        : boost::variant<
+                binance::new_order,
+                bithumb::orders,
+                upbit::orders,
+                coinbase::orders
+        >
+{
+    using boost::variant<
+            binance::new_order,
+            bithumb::orders,
+            upbit::orders,
+            coinbase::orders
+            >::variant;
+
+    static crypto_order_send construct(const flatjson::fjson& json){
+        assert(json.is_valid());
+        if(json.contains("fills")){
+            binance::new_order res = new_order::construct(json);
+            return res;
+        }else if(json.contains("time_in_force")){
+            upbit::orders res = upbit::orders::construct(json);
+            return res;
+        }else if(json.contains("uuid")){
+            bithumb::orders res = bithumb::orders::construct(json);
+            return res;
+        }else if(json.contains("profile_id")){
+            coinbase::orders res = coinbase::orders::construct(json);
+            return res;
+        }
+        assert(!"unreachable");
+    }
+
+};
+
+struct crypto_send_info
+        :boost::variant<
+                binance::send_info,
+                bithumb::send_info,
+                coinbase::send_info,
+                upbit::send_info
+        >
+{
+    using boost::variant<
+                binance::send_info,
+                bithumb::send_info,
+                coinbase::send_info,
+                upbit::send_info
+            >::variant;
+
+
+    const void* get_send_info() const {
+        if(const auto* p = boost::get<binance::send_info>(this)) return p;
+        if(const auto* p = boost::get<bithumb::send_info>(this)) return p;
+        if(const auto* p = boost::get<coinbase::send_info>(this)) return p;
+        if(const auto* p = boost::get<upbit::send_info>(this)) return p;
+        return nullptr;
+    }
+
+};
+
+
+
+/**********************************************************************************************************************/
 
 #endif //MAIN_CPP_EXCHANGETYPE_H

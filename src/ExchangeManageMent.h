@@ -346,13 +346,6 @@ public:
 
 
 public:
-    // ===================================================================================
-    virtual bool is_api_error(const flatjson::fjson& json) = 0;
-    virtual std::pair<int, std::string> info_api_error(const flatjson::fjson& json) = 0;
-    virtual std::string make_channel(const char* pair, const char* channel) = 0;
-    virtual void control_msg(Websocket& ws) = 0;
-    virtual std::string make_signed() = 0;
-    // ===================================================================================
 
     using handler = void*;
 
@@ -366,6 +359,18 @@ public:
         // --> return error when false;
         explicit operator bool() const {return err_msg.empty();}
     };
+
+    // ===================================================================================
+    // crypto api request info function
+    virtual bool is_api_error(const flatjson::fjson& json) = 0;
+    virtual std::pair<int, std::string> info_api_error(const flatjson::fjson& json) = 0;
+    virtual std::string make_channel(const char* pair, const char* channel) = 0;
+    virtual void control_msg(Websocket& ws) = 0;
+    virtual std::string make_signed(std::string params) = 0;
+    // ===================================================================================
+    // crypto order function
+    virtual rest_result<crypto_order_send> order_send(const crypto_send_info& info) = 0;
+    // ===================================================================================
 
     void ws_close(const handler &h);
     void ws_async_close(const handler &h);
@@ -590,13 +595,13 @@ private:
     const std::string port;
     const std::string pk;
     const std::string sk;
-    const std::size_t timeout;
     const std::string client_user_agent;
     ExchangeManagement& exchange;
 
     boost::asio::ssl::context ssl_context;
     boost::asio::ip::tcp::resolver resolver;
     boost::beast::flat_buffer f_buffer;
+    const std::size_t timeout;
 
 public:
     rest_impl(ExchangeManagement& _exchange,
@@ -677,13 +682,13 @@ public:
             }
         }
 
-        //std::cout << "params -> " << params << std::endl;
 
         if(_signed){
             assert(!pk.empty() && !sk.empty());
             if(!params.empty()) params.append("&");
-            params.append(exchange.make_signed());
+            params = exchange.make_signed(std::move(params));
         }
+        std::cout << "params -> " << params << std::endl;
 
         bool is_get_delete = (action == boost::beast::http::verb::get || action == boost::beast::http::verb::delete_);
 
@@ -693,7 +698,7 @@ public:
             params.clear();
         }
 
-        //std::cout << "post url -> " << post_url << std::endl;
+        std::cout << "post url -> " << post_url << std::endl;
         ExchangeManagement::rest_result<R> res{};
 
         if(!cb){ // --> sync post
@@ -739,6 +744,10 @@ public:
 
         }
     }
+
+    std::string get_str_timeout() const {return std::to_string(timeout);}
+    std::string get_sk() const {return sk;};
+
 private:
     ExchangeManagement::rest_result<std::string> sync_post(const char* post_url, boost::beast::http::verb action, std::string params){
         ExchangeManagement::rest_result<std::string> res{};
@@ -822,7 +831,7 @@ private:
         }
 
         res.v = std::move(resp.body());
-        //std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
+        std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
 
         // --> stream 에서 ssl을 종료
         ssl_stream.shutdown(ec);
