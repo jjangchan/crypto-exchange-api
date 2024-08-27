@@ -216,6 +216,7 @@ void binance_order_example(boost::asio::io_context& service,
         std::cerr << "get error: " << re.err_msg << std::endl;
         return;
     }
+    std::cout << re.v << std::endl;
     return;
 }
 

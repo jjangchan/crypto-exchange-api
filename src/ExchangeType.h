@@ -650,9 +650,11 @@ namespace binance{
                 << "\"stopPrice\":\"" << o.stopPrice << "\","
                 << "\"icebergQty\":\"" << o.icebergQty << "\","
                 << "\"time\":" << o.time << ","
-                << "\"updateTime\":" << o.updateTime << ","
-                << "\"isWorking\":" << (o.isWorking ? "true" : "false") << ",";
-                os << "}";
+                << "\"updateTime\":" << o.updateTime << ",";
+        if(o.strategyId) os << "\"strategyId\"" << o.strategyId << ",";
+        if(o.strategyType) os << "\"strategyType\"" << o.strategyType << ",";
+        os << "\"isWorking\":" << (o.isWorking ? "true" : "false")
+        << "}";
         return os;
     }
 
@@ -682,6 +684,8 @@ namespace binance{
                 __JSON_PARSE(order, time, j_order);
                 __JSON_PARSE(order, updateTime, j_order);
                 __JSON_PARSE(order, isWorking, j_order);
+                if(j_order.contains("strategyId")) __JSON_PARSE(order, strategyId, j_order);
+                if(j_order.contains("strategyType")) __JSON_PARSE(order, strategyType, j_order);
                 res.orders[order.symbol].push_back(order);
             }
 
@@ -692,14 +696,14 @@ namespace binance{
     };
 
     inline std::ostream& operator<<(std::ostream& os, const open_orders& orders){
-        os << "{";
+        os << "[" << "\n";
         for(const auto& pair : orders.orders){
             for(auto it = pair.second.begin(); it != pair.second.end(); ++it){
                 os << *it;
-                if(std::next(it) != pair.second.end()) os << ",";
+                if(std::next(it) != pair.second.end()) os << ",\n";
             }
         }
-        os << "}";
+        os  << "\n" << "]";
         return os;
     }
 
