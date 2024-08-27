@@ -24,15 +24,15 @@ docker run -it --name {cotainer_name} crypto-api
 
 # Built Path
 /source/
-|-- CMakeLists.txt
-|-- Dockerfile
-|-- include
-|-- src
-|-- unittest
-|-- build
-|	    |-- unittest
-|     |     |-- unittest# exexute file
-|     |-- crypto_exchange_api # execute file
+|---- CMakeLists.txt
+|---- Dockerfile
+|---- include
+|---- src
+|---- unittest
+|---- build
+| |---- unittest
+| |   |-- unittest# exexute file
+| |---- crypto_exchange_api # execute file
 |
 |-- README.md
 ```

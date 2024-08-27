@@ -370,6 +370,7 @@ public:
     // ===================================================================================
     // crypto order function
     virtual rest_result<crypto_order_send> order_send(const crypto_send_info& info) = 0;
+    virtual rest_result<crypto_order_open> order_open(const crypto_open_info& info) = 0;
     // ===================================================================================
 
     void ws_close(const handler &h);

@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <map>
 #include "uuid/uuid.h"
 #include "flatjson.hpp"
 
@@ -240,7 +241,23 @@ struct unix_time_data{
         return timegm( timeinfo );
     }
 };
+
 struct crypto_order_send;
+struct crypto_order_open;
+struct crypto_order_cancel;
+
+using send_cb = std::function<bool(const char* file_name,
+                                   int ec,
+                                   std::string err_msg,
+                                   crypto_order_send res)>;
+using open_cb = std::function<bool(const char* file_name,
+                                   int ec,
+                                   std::string err_msg,
+                                   crypto_order_open res)>;
+using cancel_cb = std::function<bool(const char* file_name,
+                                   int ec,
+                                   std::string err_msg,
+                                   crypto_order_cancel res)>;
 
 namespace binance{
     enum class time_frame : int{
@@ -567,6 +584,128 @@ namespace binance{
         }
     };
 
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#current-open-orders-user_data
+    struct open_order{
+        std::string symbol;
+        std::size_t orderId;
+        std::string clientOrderId;
+        double_type price;
+        double_type origQty;
+        double_type executedQty;
+        double_type cummulativeQuoteQty;
+        std::string status;
+        std::string timeInForce;
+        std::string type;
+        std::string side;
+        double_type stopPrice;
+        double_type icebergQty;
+        std::size_t time;
+        std::size_t updateTime;
+        std::size_t strategyId;
+        std::size_t strategyType;
+        bool isWorking;
+
+        static open_order construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            open_order res{};
+            __JSON_PARSE(res, symbol, json);
+            __JSON_PARSE(res, orderId, json);
+            __JSON_PARSE(res, clientOrderId, json);
+            __JSON_PARSE(res, price, json);
+            __JSON_PARSE(res, origQty, json);
+            __JSON_PARSE(res, executedQty, json);
+            __JSON_PARSE(res, cummulativeQuoteQty, json);
+            __JSON_PARSE(res, status, json);
+            __JSON_PARSE(res, timeInForce, json);
+            __JSON_PARSE(res, type, json);
+            __JSON_PARSE(res, side, json);
+            __JSON_PARSE(res, stopPrice, json);
+            __JSON_PARSE(res, icebergQty, json);
+            __JSON_PARSE(res, time, json);
+            __JSON_PARSE(res, updateTime, json);
+            __JSON_PARSE(res, isWorking, json);
+            if(json.contains("strategyId")) __JSON_PARSE(res, strategyId, json);
+            if(json.contains("strategyType")) __JSON_PARSE(res, strategyType, json);
+            return res;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const open_order& order);
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, const open_order& o) {
+        os
+                << "{"
+                << "\"symbol\":\"" << o.symbol << "\","
+                << "\"orderId\":" << o.orderId << ","
+                << "\"clientOrderId\":\"" << o.clientOrderId << "\","
+                << "\"price\":\"" << o.price << "\","
+                << "\"origQty\":\"" << o.origQty << "\","
+                << "\"executedQty\":\"" << o.executedQty << "\","
+                << "\"cummulativeQuoteQty\":\"" << o.cummulativeQuoteQty << "\","
+                << "\"status\":\"" << o.status << "\","
+                << "\"timeInForce\":\"" << o.timeInForce << "\","
+                << "\"type\":\"" << o.type << "\","
+                << "\"side\":\"" << o.side << "\","
+                << "\"stopPrice\":\"" << o.stopPrice << "\","
+                << "\"icebergQty\":\"" << o.icebergQty << "\","
+                << "\"time\":" << o.time << ","
+                << "\"updateTime\":" << o.updateTime << ","
+                << "\"isWorking\":" << (o.isWorking ? "true" : "false") << ",";
+                os << "}";
+        return os;
+    }
+
+
+    struct open_orders{
+        std::map<std::string, std::vector<open_order>> orders;
+
+        static open_orders construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            open_orders res{};
+            for(std::size_t i = 0u; i < json.size(); i++){
+                open_order order{};
+                const auto j_order = json.at(i);
+                __JSON_PARSE(order, symbol, j_order);
+                __JSON_PARSE(order, orderId, j_order);
+                __JSON_PARSE(order, clientOrderId, j_order);
+                __JSON_PARSE(order, price, j_order);
+                __JSON_PARSE(order, origQty, j_order);
+                __JSON_PARSE(order, executedQty, j_order);
+                __JSON_PARSE(order, cummulativeQuoteQty, j_order);
+                __JSON_PARSE(order, status, j_order);
+                __JSON_PARSE(order, timeInForce, j_order);
+                __JSON_PARSE(order, type, j_order);
+                __JSON_PARSE(order, side, j_order);
+                __JSON_PARSE(order, stopPrice, j_order);
+                __JSON_PARSE(order, icebergQty, j_order);
+                __JSON_PARSE(order, time, j_order);
+                __JSON_PARSE(order, updateTime, j_order);
+                __JSON_PARSE(order, isWorking, j_order);
+                res.orders[order.symbol].push_back(order);
+            }
+
+            return res;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const open_orders& orders);
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, const open_orders& orders){
+        os << "{";
+        for(const auto& pair : orders.orders){
+            for(auto it = pair.second.begin(); it != pair.second.end(); ++it){
+                os << *it;
+                if(std::next(it) != pair.second.end()) os << ",";
+            }
+        }
+        os << "}";
+        return os;
+    }
+
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#new-order-trade
+
 
 /**********************************************************************************************************************/
 
@@ -575,7 +714,7 @@ namespace binance{
         sell
     };
 
-    const char* enum_side_to_str(enum_side side){
+    inline const char* enum_side_to_str(enum_side side){
         switch (side) {
             case enum_side::buy : return "BUY";
             case enum_side::sell : return "SELL";
@@ -593,7 +732,7 @@ namespace binance{
         ,limit_maker
     };
 
-    const char* enum_type_to_str(enum_type type) {
+    inline const char* enum_type_to_str(enum_type type) {
         switch ( type ) {
             case enum_type::limit: return "LIMIT";
             case enum_type::market: return "MARKET";
@@ -614,7 +753,7 @@ namespace binance{
 
     };
 
-    const char* enum_time_to_str(enum_time time){
+    inline const char* enum_time_to_str(enum_time time){
         switch(time){
             case enum_time::GTC : return "GTC";
             case enum_time::IOC : return "IOC";
@@ -624,10 +763,6 @@ namespace binance{
     }
 
     struct send_info{
-        using send_cb = std::function<bool(const char* file_name,
-                                           int ec,
-                                           std::string err_msg,
-                                           crypto_order_send res)>;
 
         send_cb cb;
         const char* symbol;
@@ -648,11 +783,11 @@ namespace binance{
                   const enum_time _time,
                   const char* _amount,
                   const char* _price,
+                  const char* _strategyId,
+                  const char* _strategyType,
                   const char* _client_order_id,
                   const char* _stop_price,
                   const char* _iceberg_amount,
-                  const char* _strategyId,
-                  const char* _strategyType,
                   send_cb _cb = {}):
                   symbol(_symbol),
                   side(_side),
@@ -667,6 +802,32 @@ namespace binance{
                   strategyType(_strategyType),
                   cb(std::move(_cb))
                   {}
+    };
+
+    struct open_info{
+        const char* symbol;
+        const char* order_id;
+        const char* client_order_id;
+        open_cb cb;
+
+
+        open_info(const char* _symbol,
+                  open_cb _cb = {}) :
+                  symbol(_symbol),
+                  order_id(nullptr),
+                  client_order_id(nullptr),
+                  cb(std::move(_cb))
+                  {}
+
+        open_info(const char* _symbol,
+                  const char* _order_id,
+                  const char* _client_order_id,
+                  open_cb _cb = {}) :
+                  symbol(_symbol),
+                  order_id(_order_id),
+                  client_order_id(_client_order_id),
+                  cb(std::move(_cb))
+        {}
     };
 }
 
@@ -1580,7 +1741,59 @@ struct crypto_send_info
 
 };
 
+struct crypto_order_open
+        : boost::variant<
+                binance::open_orders,
+                binance::open_order
+        >
+{
+    using boost::variant<
+            binance::open_orders,
+            binance::open_order
+    >::variant;
 
+    static crypto_order_open construct(const flatjson::fjson& json){
+        assert(json.is_valid());
+        if(json.is_array() && json.at(0).contains("orderId")){
+            binance::open_orders res = binance::open_orders::construct(json);
+            return res;
+        } else if(json.contains("orderId")){
+            binance::open_order res = binance::open_order::construct(json);
+            return res;
+        }
+
+    }
+
+    const void* get_open() const {
+        if(const auto* p = boost::get<binance::open_orders>(this)) return p;
+        if(const auto* p = boost::get<binance::open_order>(this)) return p;
+        return nullptr;
+    }
+
+};
+
+struct crypto_open_info
+        : boost::variant<
+                binance::open_info
+        >
+{
+    using boost::variant<
+                binance::open_info
+            >::variant;
+
+    const void* get_send_info() const {
+        if(const auto* p = boost::get<binance::open_info>(this)) return p;
+        return nullptr;
+    }
+};
+
+struct crypto_order_cancel{
+
+};
+
+struct crypto_cancel_info{
+
+};
 
 /**********************************************************************************************************************/
 

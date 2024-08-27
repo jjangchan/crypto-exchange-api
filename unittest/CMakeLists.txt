@@ -7,7 +7,9 @@ SET(SRC
         BinanceTest.cpp
         BithumbTest.cpp
         CoinBaseTest.cpp
-        UpbitTest.cpp)
+        UpbitTest.cpp
+        #BInanceOrderTest.cpp
+        )
 
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)
 include_directories(../include)

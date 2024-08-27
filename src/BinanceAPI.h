@@ -131,6 +131,23 @@ public:
         return rest_pimpl->post(true, "/api/v3/order", boost::beast::http::verb::post, map, b_info->cb);
     }
 
+   rest_result<crypto_order_open> order_open(const crypto_open_info& info) override{
+        auto b_info = static_cast<const binance::open_info*>(info.get_send_info());
+        if(b_info->order_id){
+            const rest_impl::init_list_Type map = {
+                    {"symbol", b_info->symbol},
+                    {"orderId", b_info->order_id},
+                    {"origClientOrderId", b_info->client_order_id},
+            };
+            return rest_pimpl->post(true, "/api/v3/order", boost::beast::http::verb::get, map, b_info->cb);
+        }else{
+            const rest_impl::init_list_Type map = {
+                    {"symbol", b_info->symbol}
+            };
+            return rest_pimpl->post(true, "/api/v3/openOrders", boost::beast::http::verb::get, map, b_info->cb);
+        }
+   }
+
 
     ExchangeManagement::handler binance_on_tick(const char* pair,
                                                 const binance::time_frame period,

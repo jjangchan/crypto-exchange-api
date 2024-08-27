@@ -97,6 +97,10 @@ public:
 
     }
 
+    rest_result<crypto_order_open> order_open(const crypto_open_info& info) override{
+
+    }
+
 
     using send_value_type = boost::variant<std::vector<std::string>, const char*>;
     using send_type = std::pair<const char*, send_value_type>;

@@ -35,7 +35,7 @@ TEST_F(BinanceTest, binance_ws_1m_timer_test){
                            10000,
                            "");
     int is = 1;
-    auto handler = binance_api.binance_on_tick("BTCUSDT", time_frame::_1m, 1024, "", [&is](const char* file_name,
+    auto handler = binance_api.binance_on_tick("BTCUSDT", binance::time_frame::_1m, 1024, "", [&is](const char* file_name,
                                                                                            int ec,
                                                                                            std::string err_msg,
                                                                                            auto msg,
