@@ -582,10 +582,35 @@ namespace binance{
 
             return res;
         }
+
+        friend std::ostream& operator<<(std::ostream& os, const new_order& o);
     };
 
+    inline std::ostream &operator<<(std::ostream &os, const new_order& o) {
+        os
+                << "{"
+                << "\"symbol\":\"" << o.symbol << "\","
+                << "\"orderId\":" << o.orderId << ","
+                << "\"clientOrderId\":\"" << o.clientOrderId << "\","
+                << "\"price\":\"" << o.price << "\","
+                << "\"origQty\":\"" << o.origQty << "\","
+                << "\"executedQty\":\"" << o.executedQty << "\","
+                << "\"cummulativeQuoteQty\":\"" << o.cummulativeQuoteQty << "\","
+                << "\"status\":\"" << o.status << "\","
+                << "\"timeInForce\":\"" << o.timeInForce << "\","
+                << "\"type\":\"" << o.type << "\","
+                << "\"side\":\"" << o.side << "\",";
+        if(o.strategyId) os << "\"strategyId\"" << o.strategyId << ",";
+        if(o.strategyType) os << "\"strategyType\"" << o.strategyType << ",";
+        os << "\"timeInForce\":" << o.transactTime
+           << "}";
+
+
+        return os;
+    }
+
 /**********************************************************************************************************************/
-// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#current-open-orders-user_data
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#query-order-user_data
     struct open_order{
         std::string symbol;
         std::size_t orderId;
@@ -658,7 +683,8 @@ namespace binance{
         return os;
     }
 
-
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#current-open-orders-user_data
     struct open_orders{
         std::map<std::string, std::vector<open_order>> orders;
 
@@ -708,8 +734,105 @@ namespace binance{
     }
 
 /**********************************************************************************************************************/
-// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#new-order-trade
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#all-orders-user_data
 
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#cancel-order-trade
+    struct cancel_order{
+        std::string symbol;
+        std::size_t orderId;
+        std::string origClientOrderId;
+        std::size_t transactTime;
+        double_type price;
+        double_type origQty;
+        double_type executedQty;
+        double_type cummulativeQuoteQty;
+        std::string status;
+        std::string timeInForce;
+        std::string type;
+        std::string side;
+
+        static cancel_order construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            cancel_order res{};
+            __JSON_PARSE(res, symbol, json);
+            __JSON_PARSE(res, orderId, json);
+            __JSON_PARSE(res, origClientOrderId, json);
+            __JSON_PARSE(res, transactTime, json);
+            __JSON_PARSE(res, price, json);
+            __JSON_PARSE(res, origQty, json);
+            __JSON_PARSE(res, executedQty, json);
+            __JSON_PARSE(res, cummulativeQuoteQty, json);
+            __JSON_PARSE(res, status, json);
+            __JSON_PARSE(res, timeInForce, json);
+            __JSON_PARSE(res, type, json);
+            __JSON_PARSE(res, side, json);
+            return res;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const cancel_order& o);
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, const cancel_order& o){
+        os
+                << "{"
+                << "\"symbol\":\"" << o.symbol << "\","
+                << "\"orderId\":" << o.orderId << ","
+                << "\"clientOrderId\":\"" << o.origClientOrderId << "\","
+                << "\"price\":\"" << o.price << "\","
+                << "\"timeInForce\":\"" << o.timeInForce << "\","
+                << "\"origQty\":\"" << o.origQty << "\","
+                << "\"executedQty\":\"" << o.executedQty << "\","
+                << "\"cummulativeQuoteQty\":\"" << o.cummulativeQuoteQty << "\","
+                << "\"status\":\"" << o.status << "\","
+                << "\"timeInForce\":\"" << o.timeInForce << "\","
+                << "\"type\":\"" << o.type << "\","
+                << "\"side\":\"" << o.side;
+        return os;
+    }
+
+/**********************************************************************************************************************/
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api#cancel-all-open-orders-on-a-symbol-trade
+    struct cancel_orders{
+        std::map<std::string, std::vector<cancel_order>> orders;
+
+        static cancel_orders construct(const flatjson::fjson& json){
+            assert(json.is_valid());
+            cancel_orders res{};
+            for(std::size_t i = 0u; i < json.size(); i++){
+                auto at = json.at(i);
+                cancel_order o{};
+                __JSON_PARSE(o, symbol, at);
+                __JSON_PARSE(o, orderId, at);
+                __JSON_PARSE(o, origClientOrderId, at);
+                __JSON_PARSE(o, transactTime, at);
+                __JSON_PARSE(o, price, at);
+                __JSON_PARSE(o, origQty, at);
+                __JSON_PARSE(o, executedQty, at);
+                __JSON_PARSE(o, cummulativeQuoteQty, at);
+                __JSON_PARSE(o, status, at);
+                __JSON_PARSE(o, timeInForce, at);
+                __JSON_PARSE(o, type, at);
+                __JSON_PARSE(o, side, at);
+                res.orders[o.symbol].push_back(o);
+            }
+            return res;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const cancel_orders& orders);
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, const cancel_orders& orders){
+        os << "[" << "\n";
+        for(const auto& pair : orders.orders){
+            for(auto it = pair.second.begin(); it != pair.second.end(); ++it){
+                os << *it;
+                if(std::next(it) != pair.second.end()) os << ",\n";
+            }
+        }
+        os  << "\n" << "]";
+        return os;
+    }
 
 /**********************************************************************************************************************/
 
@@ -810,27 +933,75 @@ namespace binance{
 
     struct open_info{
         const char* symbol;
-        const char* order_id;
+        std::size_t order_id;
         const char* client_order_id;
+        std::size_t start_time;
+        std::size_t end_time;
+        std::size_t limit;
+        bool is_all;
         open_cb cb;
 
 
         open_info(const char* _symbol,
                   open_cb _cb = {}) :
                   symbol(_symbol),
-                  order_id(nullptr),
+                  order_id(0),
                   client_order_id(nullptr),
                   cb(std::move(_cb))
                   {}
 
         open_info(const char* _symbol,
-                  const char* _order_id,
+                  bool _is_all,
+                  std::size_t _order_id = 0,
+                  std::size_t _start_time = 0,
+                  std::size_t _end_time = 0,
+                  std::size_t _limit = 0,
+                  open_cb _cb = {}) :
+                  symbol(_symbol),
+                  is_all(_is_all),
+                  order_id(_order_id),
+                  start_time(_start_time),
+                  end_time(_end_time),
+                  limit(_limit),
+                  cb(std::move(_cb))
+        {}
+
+        open_info(const char* _symbol,
+                  std::size_t _order_id,
                   const char* _client_order_id,
                   open_cb _cb = {}) :
                   symbol(_symbol),
                   order_id(_order_id),
                   client_order_id(_client_order_id),
                   cb(std::move(_cb))
+        {}
+    };
+
+    struct cancel_info{
+        const char* symbol;
+        std::size_t order_id;
+        const char* client_order_id;
+        const char* new_client_order_id;
+        cancel_cb cb;
+
+        cancel_info(const char* _symbol,
+                    cancel_cb _cb = {}):
+                symbol(_symbol),
+                order_id(0),
+                client_order_id(nullptr),
+                cb(std::move(_cb))
+        {}
+
+        cancel_info(const char* _symbol,
+                    std::size_t _order_id,
+                    const char* _client_order_id,
+                    const char* _new_client_order_id = {},
+                    cancel_cb _cb = {}):
+                symbol(_symbol),
+                order_id(_order_id),
+                client_order_id(_client_order_id),
+                new_client_order_id(_new_client_order_id),
+                cb(std::move(_cb))
         {}
     };
 }
@@ -1785,17 +1956,50 @@ struct crypto_open_info
                 binance::open_info
             >::variant;
 
-    const void* get_send_info() const {
+    const void* get_open_info() const {
         if(const auto* p = boost::get<binance::open_info>(this)) return p;
         return nullptr;
     }
 };
 
-struct crypto_order_cancel{
+struct crypto_order_cancel
+        : boost::variant<
+           binance::cancel_order,
+           binance::cancel_orders
+        >
+{
+    using boost::variant<
+            binance::cancel_order,
+            binance::cancel_orders
+    >::variant;
+
+    static crypto_order_cancel construct(const flatjson::fjson& json){
+        assert(json.is_valid());
+        if(json.is_array() && json.at(0).contains("orderId")){
+            binance::cancel_orders res = binance::cancel_orders::construct(json);
+            return res;
+        } else if(json.contains("orderId")){
+            binance::cancel_order res = binance::cancel_order::construct(json);
+            return res;
+        }
+    }
 
 };
 
-struct crypto_cancel_info{
+struct crypto_cancel_info :
+        boost::variant<
+                binance::cancel_info
+        >
+
+{
+    using boost::variant<
+            binance::cancel_info
+    >::variant;
+
+    const void* get_cancel_info() const {
+        if(const auto* p = boost::get<binance::cancel_info>(this)) return p;
+        return nullptr;
+    }
 
 };
 

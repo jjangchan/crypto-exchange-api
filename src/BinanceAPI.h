@@ -132,7 +132,7 @@ public:
     }
 
    rest_result<crypto_order_open> order_open(const crypto_open_info& info) override{
-        auto b_info = static_cast<const binance::open_info*>(info.get_send_info());
+        auto b_info = static_cast<const binance::open_info*>(info.get_open_info());
         if(b_info->order_id){
             const rest_impl::init_list_Type map = {
                     {"symbol", b_info->symbol},
@@ -140,11 +140,38 @@ public:
                     {"origClientOrderId", b_info->client_order_id},
             };
             return rest_pimpl->post(true, "/api/v3/order", boost::beast::http::verb::get, map, b_info->cb);
+        }else if(b_info->is_all){
+            const rest_impl::init_list_Type map = {
+                    {"symbol", b_info->symbol},
+                    {"orderId", b_info->order_id},
+                    {"startTime", b_info->start_time},
+                    {"endTime", b_info->end_time},
+                    {"limit", b_info->limit}
+            };
+            return rest_pimpl->post(true, "/api/v3/allOrders", boost::beast::http::verb::get, map, b_info->cb);
         }else{
             const rest_impl::init_list_Type map = {
                     {"symbol", b_info->symbol}
             };
             return rest_pimpl->post(true, "/api/v3/openOrders", boost::beast::http::verb::get, map, b_info->cb);
+        }
+   }
+
+   rest_result<crypto_order_cancel> order_cancel(const crypto_cancel_info& info) override {
+        auto b_info = static_cast<const binance::cancel_info*>(info.get_cancel_info());
+        if(b_info->client_order_id || b_info->order_id){
+            const rest_impl::init_list_Type map = {
+                    {"symbol", b_info->symbol},
+                    {"orderId", b_info->order_id},
+                    {"origClientOrderId", b_info->client_order_id},
+                    {"newClientOrderId", b_info->new_client_order_id}
+            };
+            return rest_pimpl->post(true, "/api/v3/order", boost::beast::http::verb::delete_, map, b_info->cb);
+        }else{
+            const rest_impl::init_list_Type map = {
+                    {"symbol", b_info->symbol}
+            };
+            return rest_pimpl->post(true, "/api/v3/openOrders", boost::beast::http::verb::delete_, map, b_info->cb);
         }
    }
 

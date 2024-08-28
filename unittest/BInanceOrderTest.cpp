@@ -105,9 +105,10 @@ TEST_F(BinanceOrderTest, binance_order_open_test){
         ASSERT_TRUE(0);
     }
     const binance::open_orders* o = static_cast<const binance::open_orders*>(re.v.get_open());
+
     ASSERT_TRUE(!o->orders.empty());
     binance::open_info info2("LINKUSDT",
-                             std::to_string(o->orders.begin()->second[0].orderId).c_str(),
+                             o->orders.begin()->second[0].orderId,
                              o->orders.begin()->second[0].clientOrderId.c_str());
     auto re2 = binance_api.order_open(info2);
     if ( !re2 ) {

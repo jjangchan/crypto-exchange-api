@@ -371,6 +371,7 @@ public:
     // crypto order function
     virtual rest_result<crypto_order_send> order_send(const crypto_send_info& info) = 0;
     virtual rest_result<crypto_order_open> order_open(const crypto_open_info& info) = 0;
+    virtual rest_result<crypto_order_cancel> order_cancel(const crypto_cancel_info& info) = 0;
     // ===================================================================================
 
     void ws_close(const handler &h);
@@ -832,7 +833,7 @@ private:
         }
 
         res.v = std::move(resp.body());
-        //std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
+        std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
 
         // --> stream 에서 ssl을 종료
         ssl_stream.shutdown(ec);

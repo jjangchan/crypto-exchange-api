@@ -217,7 +217,13 @@ void binance_order_example(boost::asio::io_context& service,
         return;
     }
     std::cout << re.v << std::endl;
-    return;
+
+    auto c_re = binance_api.order_cancel({"LINKUSDT"});
+    if ( !c_re ) {
+        std::cerr << "get error: " << re.err_msg << std::endl;
+        return;
+    }
+    std::cout << c_re.v << std::endl;
 }
 
 int main(int argc, char** argv) {
