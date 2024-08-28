@@ -185,10 +185,6 @@ void binance_order_example(boost::asio::io_context& service,
                            std::string pk,
                            std::string sk){
     service.restart();
-
-    std::cout << "pk -> " << pk << std::endl;
-    std::cout << "sk -> " << sk << std::endl;
-
     BinanceAPI binance_api(service,
                            "stream.binance.com",
                            "9443",
@@ -200,30 +196,40 @@ void binance_order_example(boost::asio::io_context& service,
                            10000,
                            "");
 
-    /**
-    binance::send_info info("LINKUSDT",
+    // ---> send example
+    binance::send_info s_info("LINKUSDT",
                             binance::enum_side::buy,
                             binance::enum_type::limit,
                             binance::enum_time::GTC,
                             "1",
-                            "9", "100", "1000001",
+                            "10", "100", "1000001",
                             {}, {}, {});
-    auto re = binance_api.order_send(info);
-    **/
-    binance::open_info info("LINKUSDT");
-    auto re = binance_api.order_open(info);
-    if ( !re ) {
-        std::cerr << "get error: " << re.err_msg << std::endl;
+    auto re1 = binance_api.order_send(s_info);
+    if ( !re1 ) {
+        std::cerr << "get send error: " << re1.err_msg << std::endl;
         return;
     }
-    std::cout << re.v << std::endl;
+    std::cout << re1.v << std::endl;
 
-    auto c_re = binance_api.order_cancel({"LINKUSDT"});
-    if ( !c_re ) {
-        std::cerr << "get error: " << re.err_msg << std::endl;
+    // ---> open example
+    auto re2 = binance_api.order_open({"LINKUSDT"});
+    if ( !re2) {
+        std::cerr << "get open error: " << re2.err_msg << std::endl;
         return;
     }
-    std::cout << c_re.v << std::endl;
+    std::cout << re2.v << std::endl;
+
+    // ---> cancel example
+    const binance::open_orders* orders = static_cast<const binance::open_orders*>(re2.v.get_open());
+    const binance::open_order order = orders->orders.begin()->second[0];
+
+    binance::cancel_info c_info(order.symbol.c_str(), order.orderId, order.clientOrderId.c_str());
+    auto re3 = binance_api.order_cancel(c_info);
+    if (!re3) {
+        std::cerr << "get error: " << re3.err_msg << std::endl;
+        return;
+    }
+    std::cout << re3.v << std::endl;
 }
 
 int main(int argc, char** argv) {

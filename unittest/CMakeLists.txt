@@ -4,11 +4,11 @@ project(unittest)
 
 set(CMAKE_CXX_STANDARD 14)
 SET(SRC
-        BinanceTest.cpp
-        BithumbTest.cpp
-        CoinBaseTest.cpp
-        UpbitTest.cpp
-        #BInanceOrderTest.cpp
+        #BinanceTest.cpp
+        #BithumbTest.cpp
+        #CoinBaseTest.cpp
+        #UpbitTest.cpp
+        BInanceOrderTest.cpp
         )
 
 link_directories(/usr/local/lib /usr/local/opt/openssl@3/lib)

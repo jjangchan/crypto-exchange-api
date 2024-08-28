@@ -787,7 +787,8 @@ namespace binance{
                 << "\"status\":\"" << o.status << "\","
                 << "\"timeInForce\":\"" << o.timeInForce << "\","
                 << "\"type\":\"" << o.type << "\","
-                << "\"side\":\"" << o.side;
+                << "\"side\":\"" << o.side
+                << "}";
         return os;
     }
 
@@ -1295,7 +1296,13 @@ namespace bithumb {
 
             return res;
         }
+
+        friend std::ostream& operator<<(std::ostream& os, const orders& o);
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const orders& o){
+        return os;
+    }
 
     struct send_info{
 
@@ -1589,7 +1596,14 @@ namespace upbit{
             return res;
         }
 
+        friend std::ostream& operator<<(std::ostream& os, const orders& o);
+
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const orders& o){
+        return os;
+
+    }
 
     struct send_info{
 
@@ -1832,7 +1846,13 @@ namespace coinbase{
 
             return res;
         }
+
+        friend std::ostream& operator<<(std::ostream& os, const orders& o);
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const orders& o){
+        return os;
+    }
 
     struct send_info{
 
@@ -1888,6 +1908,14 @@ struct crypto_order_send
         assert(!"unreachable");
     }
 
+    const void* get_send() const {
+        if(const auto* p = boost::get<binance::new_order>(this)) return p;
+        if(const auto* p = boost::get<bithumb::orders>(this)) return p;
+        if(const auto* p = boost::get<upbit::orders>(this)) return p;
+        if(const auto* p = boost::get<coinbase::orders>(this)) return p;
+        return nullptr;
+    }
+
 };
 
 struct crypto_send_info
@@ -1936,7 +1964,7 @@ struct crypto_order_open
             binance::open_order res = binance::open_order::construct(json);
             return res;
         }
-
+        assert(!"invalid res");
     }
 
     const void* get_open() const {
@@ -1982,6 +2010,7 @@ struct crypto_order_cancel
             binance::cancel_order res = binance::cancel_order::construct(json);
             return res;
         }
+        assert(!"invalid res");
     }
 
 };

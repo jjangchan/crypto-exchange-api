@@ -690,7 +690,7 @@ public:
             if(!params.empty()) params.append("&");
             params = exchange.make_signed(std::move(params));
         }
-        std::cout << "params -> " << params << std::endl;
+        //std::cout << "params -> " << params << std::endl;
 
         bool is_get_delete = (action == boost::beast::http::verb::get || action == boost::beast::http::verb::delete_);
 
@@ -700,7 +700,7 @@ public:
             params.clear();
         }
 
-        std::cout << "post url -> " << post_url << std::endl;
+        //std::cout << "post url -> " << post_url << std::endl;
         ExchangeManagement::rest_result<R> res{};
 
         if(!cb){ // --> sync post
@@ -833,7 +833,7 @@ private:
         }
 
         res.v = std::move(resp.body());
-        std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
+        //std::cout << post_url << " REPLY:\n" << res.v << std::endl << std::endl;
 
         // --> stream 에서 ssl을 종료
         ssl_stream.shutdown(ec);
