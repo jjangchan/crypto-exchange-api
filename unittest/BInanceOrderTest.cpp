@@ -118,6 +118,8 @@ TEST_F(BinanceOrderTest, binance_order_all_open_test){
                            10000,
                            "");
     binance::open_info info("LINKUSDT", true);
+
+    // ---> all ordered test
     auto re = binance_api.order_open(info);
     if ( !re ) {
         std::cerr << "get error: " << re.err_msg << std::endl;
@@ -139,6 +141,8 @@ TEST_F(BinanceOrderTest, binance_order_open_test){
                            sk,
                            10000,
                            "");
+
+    // ---> order open test
     binance::open_info info("LINKUSDT");
     auto re = binance_api.order_open(info);
     if ( !re ) {
@@ -170,6 +174,7 @@ TEST_F(BinanceOrderTest, binance_order_cancel_test){
     const binance::open_order open = o->orders.begin()->second[0];
 
 
+    // ---> target cancel test
     binance::cancel_info info(open.symbol.c_str(),
                               open.orderId,
                               open.clientOrderId.c_str());
@@ -218,6 +223,7 @@ TEST_F(BinanceOrderTest, binance_order_all_cancel_test){
         ASSERT_TRUE(0);
     }
 
+    // ---> all cancel test
     auto c_re = binance_api.order_cancel({"LINKUSDT"});
     if ( !c_re ) {
         std::cerr << "get error: " << c_re.err_msg << std::endl;

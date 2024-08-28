@@ -235,12 +235,10 @@ void binance_order_example(boost::asio::io_context& service,
 int main(int argc, char** argv) {
     //assert(argc == 3);
     boost::asio::io_context service;
-    /**
     binance_example(service, 5);
     upbit_example(service, 5);
     bithumb_example(service, 5);
     coinbase_example(service, 60);
-    **/
     std::string pk, sk;
     if(argc == 3){
         pk = argv[1];

@@ -4,10 +4,10 @@ project(unittest)
 
 set(CMAKE_CXX_STANDARD 14)
 SET(SRC
-        #BinanceTest.cpp
-        #BithumbTest.cpp
-        #CoinBaseTest.cpp
-        #UpbitTest.cpp
+        BinanceTest.cpp
+        BithumbTest.cpp
+        CoinBaseTest.cpp
+        UpbitTest.cpp
         BInanceOrderTest.cpp
         )
 
